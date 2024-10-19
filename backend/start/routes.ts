@@ -8,8 +8,6 @@
 */
 
 import router from '@adonisjs/core/services/router'
-import { throttle } from '#start/limiter'
-import { HttpContext } from '@adonisjs/core/http'
 
 // Dynamic imports for HMR
 const SetsController = () => import('#controllers/sets_controller')
@@ -38,18 +36,20 @@ router
       return new CollectionController().indexRandom(ctx)
     })
 
-    router
-      .post('/users', async (ctx) => {
-        const { default: UserController } = await UsersController()
-        return new UserController().store(ctx)
-      })
-      .use(throttle)
+    router.post('/users', async (ctx) => {
+      const { default: UserController } = await UsersController()
+      return new UserController().store(ctx)
+    })
 
     // Use dynamic imports with router.resource API
     router.resource('sets', SetsController).apiOnly()
     router.resource('sets.comment', CommentsController).only(['store'])
     router.resource('sets.cards', CardsController).only(['index'])
-    router.resource('users', UsersController).apiOnly().except(['store'])
+    router
+      .resource('users', UsersController)
+      .apiOnly()
+      .except(['store'])
+      .where('id', router.matchers.number())
     router.resource('collections', CollectionsController).only(['index', 'store'])
     router
       .resource('users.collections', UserCollectionsController)
