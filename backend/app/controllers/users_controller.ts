@@ -175,7 +175,7 @@ export default class UsersController {
 
       // Handle any other errors
       return response.internalServerError({
-        message: 'An error occurred while creating the user',
+        message: 'An error occurred while deleting the user',
         error: error.message,
       })
     }

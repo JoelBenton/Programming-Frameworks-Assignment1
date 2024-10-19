@@ -8,6 +8,8 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { throttle } from './limiter.js'
+import Redis from '@adonisjs/redis/services/main'
 
 // Dynamic imports for HMR
 const SetsController = () => import('#controllers/sets_controller')
@@ -16,7 +18,16 @@ const UsersController = () => import('#controllers/users_controller')
 const CardsController = () => import('#controllers/cards_controller')
 const CollectionsController = () => import('#controllers/collections_controller')
 const UserCollectionsController = () => import('#controllers/user_collections_controller')
+const LimitsController = () => import('#controllers/limits_controller')
 
+const { default: limitController } = await LimitsController()
+
+// Test only Router
+router.get('/redis/clear', async () => {
+  return await Redis.flushall()
+})
+
+// Api Router Group
 router
   .group(() => {
     router.get('/', async () => {
@@ -41,8 +52,27 @@ router
       return new UserController().store(ctx)
     })
 
+    router
+      .post('/sets', async (ctx) => {
+        const { default: SetController } = await SetsController()
+        return new SetController().store(ctx)
+      })
+      .use(throttle)
+
+    router.post('sets/update-limit', async (ctx) => {
+      return new limitController().updateLimit(ctx)
+    })
+
+    router.post('sets/get-limit', async (ctx) => {
+      return new limitController().getLimit(ctx)
+    })
+
+    router.post('sets/get-remaining-requests', async (ctx) => {
+      return new limitController().getRemainingRequests(ctx)
+    })
+
     // Use dynamic imports with router.resource API
-    router.resource('sets', SetsController).apiOnly()
+    router.resource('sets', SetsController).apiOnly().except(['store'])
     router.resource('sets.comment', CommentsController).only(['store'])
     router.resource('sets.cards', CardsController).only(['index'])
     router
