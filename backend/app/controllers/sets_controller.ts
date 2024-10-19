@@ -22,11 +22,6 @@ export default class SetsController {
   async show({ params, response }: HttpContext) {}
 
   /**
-   * Edit individual record
-   */
-  async edit({ params, response }: HttpContext) {}
-
-  /**
    * Handle form submission for the edit action
    */
   async update({ params, request, response }: HttpContext) {}
