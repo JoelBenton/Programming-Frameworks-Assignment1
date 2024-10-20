@@ -31,7 +31,7 @@ export default class UsersController {
       // Return a 500 Internal Server Error response
       return response.internalServerError({
         message: 'An error occurred while retrieving users',
-        error: error.message,
+        error: error,
       })
     }
   }
@@ -60,14 +60,14 @@ export default class UsersController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Data Validation failed / The user could not be created',
-          errors: error.messages,
+          errors: error,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while creating the user',
-        error: error.message,
+        error: error,
       })
     }
   }
@@ -88,14 +88,14 @@ export default class UsersController {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.forbidden({
           message: 'The user was not found',
-          error: error.message,
+          error: error,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while creating the user',
-        error: error.message,
+        error: error,
       })
     }
   }
@@ -133,7 +133,7 @@ export default class UsersController {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.notFound({
           message: 'No user found with that ID',
-          error: error.message,
+          error: error,
         })
       }
 
@@ -141,14 +141,14 @@ export default class UsersController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Data Validation failed',
-          errors: error.messages,
+          errors: error,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while updating the user',
-        error: error.message,
+        error: error,
       })
     }
   }
@@ -169,14 +169,14 @@ export default class UsersController {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.forbidden({
           message: 'No User with that ID.',
-          error: error.message,
+          error: error,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while deleting the user',
-        error: error.message,
+        error: error,
       })
     }
   }

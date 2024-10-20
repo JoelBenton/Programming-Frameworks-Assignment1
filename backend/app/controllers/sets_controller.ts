@@ -1,3 +1,4 @@
+import Comment from '#models/comment'
 import Flashcard from '#models/flashcard'
 import FlashcardSet from '#models/flashcard_set'
 import { flashcardSetsValidator } from '#validators/flashcard_set'
@@ -44,7 +45,7 @@ export default class SetsController {
       // Return a 500 Internal Server Error response
       return response.internalServerError({
         message: 'An error occurred while retrieving users',
-        error: error.message,
+        error: error,
       })
     }
   }
@@ -52,7 +53,35 @@ export default class SetsController {
   /**
    * Display a list of resource for user ID.
    */
-  async userIndex({ params, response }: HttpContext) {}
+  async userIndex({ params, response }: HttpContext) {
+    const userId = params.user_id
+
+    try {
+      const flashcardSets = await FlashcardSet.query()
+        .apply((scopes) => scopes.userId(userId))
+        .preload('flashcards')
+      const flashcardSetsList = flashcardSets.map((obj) => returnFlashcardSetData(obj))
+      return response.ok({
+        message: 'Users Created Flashcard sets found',
+        data: flashcardSetsList,
+      })
+    } catch (error) {
+      console.log(error)
+
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.notFound({
+          message: 'The user was not found',
+          error: error,
+        })
+      }
+
+      // Handle any other errors
+      return response.internalServerError({
+        message: 'An error occurred while obtaining Users created Flashcard Sets',
+        error: error,
+      })
+    }
+  }
 
   /**
    * Handle form submission for the create action
@@ -106,7 +135,7 @@ export default class SetsController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Data Validation failed / The user could not be created',
-          errors: error.messages,
+          errors: error,
         })
       }
 
@@ -121,12 +150,126 @@ export default class SetsController {
   /**
    * Show individual record
    */
-  async show({ params, response }: HttpContext) {}
+  async show({ params, response }: HttpContext) {
+    const id = params.id
+
+    try {
+      const flashcardSet = await FlashcardSet.findOrFail(id)
+      await flashcardSet.load('flashcards')
+      await flashcardSet.load('comments', (commentQuery) => {
+        commentQuery.preload('user')
+      })
+      const flashcardSetsList = returnFlashcardSetData(flashcardSet)
+
+      const flashcardSetsWithComments = {
+        ...flashcardSetsList,
+        comments: flashcardSet.comments.map((comment) => ({
+          comment: comment.comment,
+          author: {
+            id: comment.user.id,
+            username: comment.user.username,
+            admin: Boolean(comment.user.admin),
+          },
+        })),
+      }
+      return response.ok({
+        message: 'Flashcard set found',
+        data: flashcardSetsWithComments,
+      })
+    } catch (error) {
+      console.log(error)
+
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.notFound({
+          message: 'The Flashcard Set was not found',
+          error: error,
+        })
+      }
+
+      // Handle any other errors
+      return response.internalServerError({
+        message: 'An error occurred while obtaining Flashcard Sets',
+        error: error,
+      })
+    }
+  }
 
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response }: HttpContext) {}
+  async update({ params, request, response }: HttpContext) {
+    const setId = params.id
+
+    try {
+      const data = request.all()
+
+      const payload = await flashcardSetsValidator.validate(data)
+      const flashcardSet = await FlashcardSet.findOrFail(setId)
+
+      flashcardSet.name = payload.name
+      await flashcardSet.save()
+      const existingFlashcards = await flashcardSet.related('flashcards').query()
+
+      // Create a map of existing flashcards by their ID for easy lookup
+      const existingFlashcardsMap = new Map(existingFlashcards.map((card) => [card.id, card]))
+
+      // Track the IDs of the cards in the request payload
+      const incomingCardIds = payload.cards.map((card) => card.id).filter((id) => id !== undefined)
+
+      // 1. Delete cards that are no longer in the incoming request
+      const cardsToDelete = existingFlashcards.filter((card) => !incomingCardIds.includes(card.id))
+      await Promise.all(cardsToDelete.map((card) => card.delete()))
+
+      // 2. Add or update the flashcards
+      for (const cardData of payload.cards) {
+        if (cardData.id) {
+          // Update existing card
+          const existingCard = existingFlashcardsMap.get(cardData.id)
+          if (existingCard) {
+            existingCard.question = cardData.question
+            existingCard.answer = cardData.answer
+            existingCard.difficulty = cardData.difficulty
+            await existingCard.save()
+          }
+        } else {
+          // Create a new flashcard
+          await flashcardSet.related('flashcards').create({
+            question: cardData.question,
+            answer: cardData.answer,
+            difficulty: cardData.difficulty,
+          })
+        }
+      }
+
+      await flashcardSet.load('flashcards')
+
+      return response.ok({
+        message: 'Flashcard set updated successfully',
+        data: returnFlashcardSetData(flashcardSet),
+      })
+    } catch (error) {
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.notFound({
+          message: 'Flashcard set not found',
+          error: error,
+        })
+      }
+
+      // Handle validation errors
+      if (error.code === 'E_VALIDATION_FAILURE') {
+        return response.badRequest({
+          message: 'Data Validation failed',
+          errors: error,
+        })
+      }
+
+      // Handle any other errors
+      return response.internalServerError({
+        message: 'An error occurred while updating the flashcard set',
+        error: error,
+      })
+    }
+  }
 
   /**
    * Delete record
@@ -137,21 +280,19 @@ export default class SetsController {
     try {
       const flashcardSet = await FlashcardSet.findOrFail(id)
       flashcardSet.delete()
-      return response.created({
-        message: 'Flashcard Set Deleted',
-      })
+      return response.noContent()
     } catch (error) {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.forbidden({
           message: 'No flashcard Set with that ID.',
-          error: error.messages,
+          error: error,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while deleting the flashcard Set',
-        error: error.messages,
+        error: error,
       })
     }
   }

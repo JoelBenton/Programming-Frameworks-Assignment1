@@ -144,6 +144,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /sets/update-limit:
+    get:
+      summary: "Update Limit of Flashcard Sets that can be created each day."
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "200":
+          description: "Limit Updated"
+        "404":
+          description: "Limit not found"
+  /sets/get-limit:
+    get:
+      summary: "Get the current Limit of Flashcard Sets that can be created each day."
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "200":
+          description: "Limit"
+          content:
+            application/json:
+              schema:
+                properties:
+                  limit:
+                    type: "number"
+                    example: 20
+        "404":
+          description: "Limit not found"
+  /sets/get-remaining-requests:
+    get:
+      summary: "Get the remaining Limit of Flashcard Sets that can be created each day."
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "200":
+          description: "Remaining Flashcard Sets that can be created."
+          content:
+            application/json:
+              schema:
+                properties:
+                  limit:
+                    type: "number"
+                    example: 5
+        "404":
+          description: "Remaining Limit not found"
   /set/{setID}/comment:
     parameters:
       - name: setID
@@ -166,6 +210,9 @@ paths:
                 comment:
                   type: "string"
                   example: "I love this set!"
+                user_id:
+                  type: "number"
+                  example: 1
       responses:
         "201":
           description: "The created comment"
@@ -576,6 +623,9 @@ components:
     FlashCard:
       type: "object"
       properties:
+        id:
+          type: "number"
+          example: 1
         question:
           type: "string"
           example: "What is the capital of France?"

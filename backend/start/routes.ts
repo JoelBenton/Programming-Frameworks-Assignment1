@@ -22,11 +22,6 @@ const LimitsController = () => import('#controllers/limits_controller')
 
 const { default: limitController } = await LimitsController()
 
-// Test only Router
-router.get('/redis/clear', async () => {
-  return await Redis.flushall()
-})
-
 // Api Router Group
 router
   .group(() => {
@@ -73,7 +68,7 @@ router
 
     // Use dynamic imports with router.resource API
     router.resource('sets', SetsController).apiOnly().except(['store'])
-    router.resource('sets.comment', CommentsController).only(['store'])
+    router.resource('set.comment', CommentsController).only(['store'])
     router.resource('sets.cards', CardsController).only(['index'])
     router
       .resource('users', UsersController)

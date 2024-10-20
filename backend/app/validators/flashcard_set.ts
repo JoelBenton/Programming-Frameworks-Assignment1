@@ -6,6 +6,7 @@ export const flashcardSetsValidator = vine.compile(
     userId: vine.number(),
     cards: vine.array(
       vine.object({
+        id: vine.number().optional(),
         question: vine.string().trim(),
         answer: vine.string().trim(),
         difficulty: vine.enum(['easy', 'medium', 'hard']),
