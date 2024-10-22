@@ -116,7 +116,9 @@ export default class UsersController {
       // Update the user fields with validated data
       user.username = payload.username
       user.password = payload.password
-      user.admin = payload.admin
+      if (payload.admin) {
+        user.admin = payload.admin
+      }
 
       // Save the updated user
       await user.save()

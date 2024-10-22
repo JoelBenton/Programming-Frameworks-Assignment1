@@ -10,6 +10,7 @@ export default class AuthController {
 
     return response.created(user)
   }
+
   async login({ request, response }: HttpContext) {
     const { username, password } = await request.validateUsing(loginValidator)
 
@@ -21,6 +22,7 @@ export default class AuthController {
       ...user.serialize(),
     })
   }
+
   async logout({ auth, response }: HttpContext) {
     const user = auth.getUserOrFail()
     const token = auth.user?.currentAccessToken.identifier
