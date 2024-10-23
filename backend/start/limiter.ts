@@ -27,12 +27,9 @@ export const throttle = limiter.define('api', async () => {
   let totalRequests = Number(await Redis.get(totalRequestsKey))
 
   if (!totalRequests) {
-    console.log('test1')
     totalRequests = 0
     await Redis.set(totalRequestsKey, String(totalRequests))
-    console.log('test2')
     await Redis.expire(totalRequestsKey, timeUntilMidnight()) // Set to expire at midnight
-    console.log('test3')
   }
 
   // Fetch the maximum requests per day from Redis

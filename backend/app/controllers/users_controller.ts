@@ -1,6 +1,7 @@
 import User from '#models/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import { usersValidator } from '#validators/user'
+import { isAdmin } from '#policies/main'
 
 function returnUserData(userData: User) {
   return {
@@ -103,7 +104,7 @@ export default class UsersController {
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response }: HttpContext) {
+  async update({ params, request, response, bouncer }: HttpContext) {
     const id = params.id
 
     try {
@@ -117,7 +118,11 @@ export default class UsersController {
       user.username = payload.username
       user.password = payload.password
       if (payload.admin) {
-        user.admin = payload.admin
+        if (await bouncer.allows(isAdmin)) {
+          user.admin = payload.admin
+        } else {
+          return response.forbidden({ message: 'User not Authenticated for this action!' })
+        }
       }
 
       // Save the updated user

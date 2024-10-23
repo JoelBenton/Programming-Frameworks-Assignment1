@@ -1,6 +1,6 @@
-import Comment from '#models/comment'
 import Flashcard from '#models/flashcard'
 import FlashcardSet from '#models/flashcard_set'
+import { isAdmin } from '#policies/main'
 import { flashcardSetsValidator } from '#validators/flashcard_set'
 import type { HttpContext } from '@adonisjs/core/http'
 import Redis from '@adonisjs/redis/services/main'
@@ -86,18 +86,23 @@ export default class SetsController {
   /**
    * Handle form submission for the create action
    */
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, bouncer, auth }: HttpContext) {
     try {
       let totalRequests = Number(await Redis.get(totalRequestsKey))
       const limit = Number(await Redis.get(limitKey))
+      let admin = false
 
       const remainingRequests = limit - totalRequests
       console.log(remainingRequests)
 
-      if (remainingRequests <= 0) {
-        return response.tooManyRequests({
-          message: 'Rate limit exceeded. Try again tomorrow.',
-        })
+      if (await !bouncer.allows(isAdmin)) {
+        if (remainingRequests <= 0) {
+          return response.tooManyRequests({
+            message: 'Rate limit exceeded. Try again tomorrow.',
+          })
+        }
+      } else {
+        admin = true
       }
 
       // Get all request data
@@ -123,7 +128,9 @@ export default class SetsController {
 
       await flashcardSet.load('flashcards')
 
-      Redis.set(totalRequestsKey, totalRequests + 1)
+      if (!admin) {
+        Redis.set(totalRequestsKey, totalRequests + 1)
+      }
 
       // Return a response with the created user details
       return response.created({
