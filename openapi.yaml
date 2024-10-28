@@ -16,7 +16,7 @@ paths:
         - "General"
       responses:
         "200":
-          description: "The active API version"
+          description: "The User Details including auth token."
           content:
             application/json:
               schema:
@@ -25,6 +25,91 @@ paths:
                   version:
                     type: "string"
                     example: "1.0.0"
+                
+  /login:
+    post:
+      summary: "Login"
+      tags:
+        - "General"
+      responses:
+        "200":
+          description: "Successfully logged in"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                allOf:
+                  - $ref: "#/components/schemas/Token"
+                  - $ref: "#/components/schemas/User"
+        "400":
+          description: "Invalid user credentials"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: "Unprocessable Entity: Validator Error (Missing or invalid options passed in)"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+  /register:
+    post:
+      summary: "Register"
+      tags:
+        - "General"
+      responses:
+        "201":
+          description: "Successfully registered"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  username:
+                    type: string
+                    example: "JohnDoe"
+                  createdAt:
+                    type: "string"
+                    example: "2024-10-22T15:17:25.110+01:00"
+                  updatedAt:
+                    type: "string"
+                    example: "2024-10-22T15:17:25.110+01:00"
+                  id:
+                    type: "integer"
+                    example: 1
+        "422":
+          description: "Unprocessable Entity: Validator Error (Missing or invalid options passed in)"
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Error"
+  /logout:
+    post:
+      summary: "Logout"
+      tags:
+        - "General"
+      responses:
+        "200":
+          description: "Successfully Logged Out"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Logged Out"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
   /sets:
     get:
       summary: "Get all flashcard sets"
@@ -57,6 +142,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "429":
           description: "You have reached the maximum number of flashcard sets allowed today"
           content:
@@ -97,11 +192,6 @@ paths:
                               example: "I love this set!"
                             author:
                               $ref: "#/components/schemas/User"
-
-
-
-
-
         "404":
           description: "The flashcard set was not found"
           content:
@@ -125,6 +215,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "404":
           description: "The flashcard set was not found"
           content:
@@ -138,12 +238,76 @@ paths:
       responses:
         "204":
           description: "The flashcard set was deleted"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "404":
           description: "The flashcard set was not found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /sets/update-limit:
+    post:
+      summary: "Update Limit of Flashcard Sets that can be created each day."
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "200":
+          description: "Limit Updated"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
+        "404":
+          description: "Limit not found"
+  /sets/get-limit:
+    get:
+      summary: "Get the current Limit of Flashcard Sets that can be created each day."
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "200":
+          description: "Limit"
+          content:
+            application/json:
+              schema:
+                properties:
+                  limit:
+                    type: "number"
+                    example: 20
+        "404":
+          description: "Limit not found"
+  /sets/get-remaining-requests:
+    get:
+      summary: "Get the remaining Limit of Flashcard Sets that can be created each day."
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "200":
+          description: "Remaining Flashcard Sets that can be created."
+          content:
+            application/json:
+              schema:
+                properties:
+                  limit:
+                    type: "number"
+                    example: 5
+        "404":
+          description: "Remaining Limit not found"
   /set/{setID}/comment:
     parameters:
       - name: setID
@@ -166,6 +330,9 @@ paths:
                 comment:
                   type: "string"
                   example: "I love this set!"
+                user_id:
+                  type: "number"
+                  example: 1
       responses:
         "201":
           description: "The created comment"
@@ -173,6 +340,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Comment"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "404":
           description: "The flashcard set was not found"
           content:
@@ -258,6 +435,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
   /users/{userId}:
     parameters:
       - name: userId
@@ -309,6 +496,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "404":
           description: "The user was not found"
           content:
@@ -322,6 +519,16 @@ paths:
       responses:
         "204":
           description: "The user was deleted"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "404":
           description: "The user was not found"
           content:
@@ -371,11 +578,28 @@ paths:
                 items:
                   type: "object"
                   properties:
-                    comment:
+                    name:
                       type: "string"
-                      description: "The user's comment on the set"
-                    set:
-                      $ref: "#/components/schemas/FlashcardSet"
+                      example: "Geography Sets"
+                    sets:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          comment:
+                            type: "string"  
+                            description: "The user's comment on the set"
+                          set:
+                            $ref: "#/components/schemas/FlashcardSet"
+                    user:
+                      type: "object"
+                      properties:
+                        id:
+                          type: string
+                          example: "1"
+                        username:
+                          type: string
+                          example: "JohnDoe"
   /users/{userID}/collections/{collectionID}:
     parameters:
       - name: userID
@@ -402,13 +626,28 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  comment:
+                  name:
                     type: "string"
-                    description: "The user's comment on the set"
-                  set:
-                    $ref: "#/components/schemas/FlashcardSet"
+                    example: "Geography Sets"
+                  sets:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        comment:
+                          type: "string"  
+                          description: "The user's comment on the set"
+                        set:
+                          $ref: "#/components/schemas/FlashcardSet"
                   user:
-                    $ref: "#/components/schemas/User"
+                    type: "object"
+                    properties:
+                      id:
+                        type: string
+                        example: "1"
+                      username:
+                        type: string
+                        example: "JohnDoe"
         "404":
           description: "The flashcard set collection was not found"
           content:
@@ -426,9 +665,20 @@ paths:
             schema:
               type: "object"
               properties:
-                comment:
+                name:
                   type: "string"
-                  example: "I love this set!"
+                  example: "Geography Sets"
+                sets:
+                  type: "array"
+                  items:
+                    type: "object"
+                    properties:
+                      comment:
+                        type: "string"
+                        example: "I love this set!"
+                      setID:
+                        type: "number"
+                        example: 1
       responses:
         "200":
           description: "The updated flashcard set collection"
@@ -437,13 +687,20 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  comment:
+                  name:
                     type: "string"
                     description: "The user's comment on the set"
                   set:
                     $ref: "#/components/schemas/FlashcardSet"
                   user:
-                    $ref: "#/components/schemas/User"
+                    type: "object"
+                    properties:
+                      id:
+                        type: "number"
+                        example: 1
+                      username:
+                        type: "string"
+                        example: "Username"
         "404":
           description: "The flashcard set collection was not found"
           content:
@@ -502,13 +759,28 @@ paths:
                 items:
                   type: "object"
                   properties:
-                    comment:
+                    name:
                       type: "string"
-                      description: "The user's comment on the set"
-                    set:
-                      $ref: "#/components/schemas/FlashcardSet"
-                    User:
-                      $ref: "#/components/schemas/User"
+                      example: "Geography Sets"
+                    sets:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          comment:
+                            type: "string"  
+                            description: "The user's comment on the set"
+                          set:
+                            $ref: "#/components/schemas/FlashcardSet"
+                    user:
+                      type: "object"
+                      properties:
+                        id:
+                          type: string
+                          example: "1"
+                        username:
+                          type: string
+                          example: "JohnDoe"
     post:
       summary: "Create a new flashcard set collection"
       tags:
@@ -518,14 +790,23 @@ paths:
         content:
           application/json:
             schema:
-              type: "array"
-              items:
-                type: "object"
-                properties:
-                  comment:
-                    type: "string"
-                    example: "I love this set!"
-                  setID:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                  example: "Geography Sets"
+                sets:
+                  type: "array"
+                  items:
+                    type: "object"
+                    properties:
+                      comment:
+                        type: "string"
+                        example: "I love this set!"
+                      setID:
+                        type: "number"
+                        example: 1
+                userId:
                     type: "number"
                     example: 1
 
@@ -537,13 +818,39 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  comment:
+                  name:
                     type: "string"
-                    description: "The user's comment on the set"
-                  set:
-                    $ref: "#/components/schemas/FlashcardSet"
+                    example: "Geography Sets"
+                  sets:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        comment:
+                          type: "string"
+                          example: "I love this set!"
+                        setID:
+                          type: "number"
+                          example: 1
                   user:
-                    $ref: "#/components/schemas/User"
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                        example: "user123"
+                      username:
+                        type: "string"
+                        example: "john_doe"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
         "404":
           description: "The flashcard set was not found"
           content:
@@ -576,6 +883,9 @@ components:
     FlashCard:
       type: "object"
       properties:
+        id:
+          type: "number"
+          example: 1
         question:
           type: "string"
           example: "What is the capital of France?"
@@ -645,3 +955,22 @@ components:
         author:
           $ref: "#/components/schemas/User"
           nullable: true
+    Token:
+      type: "object"
+      properties:
+        Token:
+          type: "object"
+          properties:
+            type:
+              type: "string"
+              example: "bearer"
+            name:
+              type: "string"
+            token: 
+              type: "string"
+            abilities:
+              type: "object"
+            lastUsedAt:
+              type: "string"
+            expiresAt:
+              type: "string"

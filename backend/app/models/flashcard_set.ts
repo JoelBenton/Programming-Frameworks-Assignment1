@@ -1,6 +1,7 @@
-import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import { BaseModel, column, belongsTo, hasMany, scope } from '@adonisjs/lucid/orm'
 import Flashcard from '#models/flashcard'
 import User from '#models/user'
+import Comment from '#models/comment'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 
@@ -25,4 +26,11 @@ export default class FlashcardSet extends BaseModel {
 
   @hasMany(() => Flashcard)
   declare flashcards: HasMany<typeof Flashcard>
+
+  @hasMany(() => Comment)
+  declare comments: HasMany<typeof Comment>
+
+  public static userId = scope((query, userId: number) => {
+    query.where('userId', userId)
+  })
 }

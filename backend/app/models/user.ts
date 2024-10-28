@@ -1,22 +1,27 @@
-// app/Models/User.ts
 import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import FlashcardSet from '#models/flashcard_set'
 import Comment from '#models/comment'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
-import encryption from '@adonisjs/core/services/encryption'
 import { DateTime } from 'luxon'
+import { AccessToken } from '@adonisjs/auth/access_tokens'
+import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
+import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import hash from '@adonisjs/core/services/hash'
+import { compose } from '@adonisjs/core/helpers'
 
-export default class User extends BaseModel {
+const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
+  uids: ['username'],
+  passwordColumnName: 'password',
+})
+
+export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
   declare username: string
 
-  @column({
-    prepare: (value: string | null) => (value ? encryption.encrypt(value) : null),
-    consume: (value: string | null) => (value ? encryption.decrypt(value) : null),
-  })
+  @column({ serializeAs: null })
   declare password: string
 
   @column()
@@ -33,4 +38,6 @@ export default class User extends BaseModel {
 
   @hasMany(() => Comment)
   declare comments: HasMany<typeof Comment>
+
+  static accessTokens = DbAccessTokensProvider.forModel(User)
 }
