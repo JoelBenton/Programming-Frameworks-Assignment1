@@ -45,7 +45,7 @@ export default class SetsController {
       // Return a 500 Internal Server Error response
       return response.internalServerError({
         message: 'An error occurred while retrieving users',
-        error: error,
+        error: error.message,
       })
     }
   }
@@ -66,19 +66,17 @@ export default class SetsController {
         data: flashcardSetsList,
       })
     } catch (error) {
-      console.log(error)
-
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.notFound({
           message: 'The user was not found',
-          error: error,
+          error: error.message,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while obtaining Users created Flashcard Sets',
-        error: error,
+        error: error.message,
       })
     }
   }
@@ -108,13 +106,16 @@ export default class SetsController {
       // Get all request data
       const data = request.all()
 
+      // Get current authenticated User
+      const user = auth.getUserOrFail()
+
       // Validate the data using the validator
       const payload = await flashcardSetsValidator.validate(data)
 
       // Create the user in the database
       const flashcardSet = await FlashcardSet.create({
         name: payload.name,
-        userId: payload.userId,
+        userId: user.id,
       })
 
       for (const card of payload.cards) {
@@ -142,14 +143,14 @@ export default class SetsController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Data Validation failed / The user could not be created',
-          errors: error,
+          errors: error.message,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while creating the Flashcard Set',
-        error: error,
+        error: error.message,
       })
     }
   }
@@ -189,14 +190,14 @@ export default class SetsController {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.notFound({
           message: 'The Flashcard Set was not found',
-          error: error,
+          error: error.message,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while obtaining Flashcard Sets',
-        error: error,
+        error: error.message,
       })
     }
   }
@@ -258,7 +259,7 @@ export default class SetsController {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.notFound({
           message: 'Flashcard set not found',
-          error: error,
+          error: error.message,
         })
       }
 
@@ -266,7 +267,7 @@ export default class SetsController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Data Validation failed',
-          errors: error,
+          errors: error.message,
         })
       }
 
@@ -292,14 +293,14 @@ export default class SetsController {
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.forbidden({
           message: 'No flashcard Set with that ID.',
-          error: error,
+          error: error.message,
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while deleting the flashcard Set',
-        error: error,
+        error: error.message,
       })
     }
   }

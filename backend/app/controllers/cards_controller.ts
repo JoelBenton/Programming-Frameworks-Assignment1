@@ -38,7 +38,7 @@ export default class CardsController {
 
       return response.internalServerError({
         message: 'An error occurred while fetching flashcards',
-        error: error,
+        error: error.message,
       })
     }
   }

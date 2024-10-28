@@ -60,14 +60,14 @@ export default class CommentsController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Validation failed',
-          errors: error, // Assuming error contains messages
+          errors: error.message, // Assuming error contains messages
         })
       }
 
       // Handle any other errors
       return response.internalServerError({
         message: 'An error occurred while creating the comment',
-        error: error,
+        error: error.message,
       })
     }
   }

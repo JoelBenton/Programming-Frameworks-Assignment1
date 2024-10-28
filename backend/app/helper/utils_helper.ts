@@ -5,3 +5,9 @@ export function shuffleArray(array: any[]) {
     ;[array[i], array[j]] = [array[j], array[i]]
   }
 }
+
+export function getRandomObject<T>(array: T[]): T | undefined {
+  if (array.length === 0) return undefined // Handle empty array
+  const randomIndex = Math.floor(Math.random() * array.length)
+  return array[randomIndex]
+}

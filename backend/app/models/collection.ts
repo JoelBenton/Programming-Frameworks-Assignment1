@@ -1,18 +1,15 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import User from '#models/user'
-import FlashcardSet from '#models/flashcard_set'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import CollectionSet from '#models/collection_set'
 
 export default class Collection extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
   @column()
-  declare comment: string
-
-  @column()
-  declare flashcardSetId: number
+  declare name: string
 
   @column()
   declare userId: number
@@ -23,8 +20,8 @@ export default class Collection extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
-  @belongsTo(() => FlashcardSet)
-  declare flashcardSet: BelongsTo<typeof FlashcardSet>
+  @hasMany(() => CollectionSet)
+  declare sets: HasMany<typeof CollectionSet>
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>

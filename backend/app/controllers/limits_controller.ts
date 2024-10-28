@@ -23,12 +23,12 @@ export default class LimitsController {
       if (error.code === 'E_VALIDATION_FAILURE') {
         return response.badRequest({
           message: 'Data Validation failed / The limit could not be updated',
-          errors: error,
+          error: error.message,
         })
       } else {
         return response.internalServerError({
           message: 'An error occurred while updating the limit',
-          error: error,
+          error: error.message,
         })
       }
     }

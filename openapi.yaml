@@ -679,15 +679,6 @@ paths:
                       setID:
                         type: "number"
                         example: 1
-                user:
-                  type: "object"
-                  properties:
-                    id:
-                      type: "string"
-                      example: "user123"
-                    username:
-                      type: "string"
-                      example: "john_doe"
       responses:
         "200":
           description: "The updated flashcard set collection"
@@ -696,13 +687,20 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  comment:
+                  name:
                     type: "string"
                     description: "The user's comment on the set"
                   set:
                     $ref: "#/components/schemas/FlashcardSet"
                   user:
-                    $ref: "#/components/schemas/User"
+                    type: "object"
+                    properties:
+                      id:
+                        type: "number"
+                        example: 1
+                      username:
+                        type: "string"
+                        example: "Username"
         "404":
           description: "The flashcard set collection was not found"
           content:
@@ -808,15 +806,9 @@ paths:
                       setID:
                         type: "number"
                         example: 1
-                user:
-                  type: "object"
-                  properties:
-                    id:
-                      type: "string"
-                      example: "user123"
-                    username:
-                      type: "string"
-                      example: "john_doe"
+                userId:
+                    type: "number"
+                    example: 1
 
       responses:
         "201":
