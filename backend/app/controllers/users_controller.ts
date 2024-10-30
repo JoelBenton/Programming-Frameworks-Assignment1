@@ -40,13 +40,17 @@ export default class UsersController {
   /**
    * Handle form submission for the create action
    */
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, bouncer }: HttpContext) {
     try {
       // Get all request data
       const data = request.all()
 
       // Validate the data using the validator
       const payload = await usersValidator.validate(data)
+
+      if (!(await bouncer.allows(isAdmin)) && Boolean(payload.admin) === true) {
+        return response.forbidden({ message: 'User not Authenticated for this action!' })
+      }
 
       // Create the user in the database
       const user = await User.create(payload)
@@ -58,10 +62,10 @@ export default class UsersController {
       })
     } catch (error) {
       // Handle validation errors and other potential errors
-      if (error.code === 'E_VALIDATION_FAILURE') {
+      if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
           message: 'Data Validation failed / The user could not be created',
-          errors: error.message,
+          error: error.message,
         })
       }
 
@@ -81,13 +85,13 @@ export default class UsersController {
 
     try {
       const user = await User.findOrFail(id)
-      return response.created({
+      return response.ok({
         message: 'User found',
         data: returnUserData(user),
       })
     } catch (error) {
       if (error.code === 'E_ROW_NOT_FOUND') {
-        return response.forbidden({
+        return response.notFound({
           message: 'The user was not found',
           error: error.message,
         })
@@ -104,10 +108,16 @@ export default class UsersController {
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response, bouncer }: HttpContext) {
+  async update({ params, request, response, bouncer, auth }: HttpContext) {
     const id = params.id
 
     try {
+      const authUser = auth.getUserOrFail()
+
+      if (authUser.id !== id && !authUser.admin) {
+        return response.forbidden({ message: 'User not Authenticated for this action!' })
+      }
+
       const data = request.all()
       const payload = await usersValidator.validate(data)
 
@@ -145,7 +155,7 @@ export default class UsersController {
       }
 
       // Handle validation errors
-      if (error.code === 'E_VALIDATION_FAILURE') {
+      if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
           message: 'Data Validation failed',
           errors: error.message,

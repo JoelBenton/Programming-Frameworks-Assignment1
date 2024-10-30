@@ -100,7 +100,7 @@ paths:
                   message:
                     type: string
                     example: "Logged Out"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -142,7 +142,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -215,7 +215,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -238,7 +238,7 @@ paths:
       responses:
         "204":
           description: "The flashcard set was deleted"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -262,7 +262,7 @@ paths:
       responses:
         "200":
           description: "Limit Updated"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -340,7 +340,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Comment"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -413,10 +413,16 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-              - $ref: "#/components/schemas/User"
-              - type: object
                 properties:
+                  username:
+                    type: "string"
+                    example: "johndoe"
+                  admin:
+                    type: "boolean"
+                    example: false
+                    default: false
+                    nullable: true
+                    description: "The set creation limit should only apply to non-admin users"
                   password:
                     type: "string"
                     format: "password"
@@ -435,7 +441,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -480,15 +486,18 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-              - $ref: "#/components/schemas/User"
-              - type: object
                 properties:
+                  username:
+                    type: "string"
+                    example: "Username"
                   password:
                     type: "string"
                     format: "password"
                     example: "password"
                     nullable: true
+                  admin:
+                    type: "boolean"
+                    example: false
       responses:
         "200":
           description: "The updated user"
@@ -496,7 +505,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-        "401":
+        "400":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: Data Validation Error
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -519,7 +538,7 @@ paths:
       responses:
         "204":
           description: "The user was deleted"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -841,7 +860,7 @@ paths:
                       username:
                         type: "string"
                         example: "john_doe"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:

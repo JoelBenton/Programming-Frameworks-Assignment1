@@ -57,7 +57,7 @@ export default class CommentsController {
       console.error('Error creating comment:', error)
 
       // Handle validation errors
-      if (error.code === 'E_VALIDATION_FAILURE') {
+      if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
           message: 'Validation failed',
           errors: error.message, // Assuming error contains messages

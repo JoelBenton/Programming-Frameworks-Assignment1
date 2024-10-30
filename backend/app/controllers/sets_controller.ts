@@ -93,7 +93,7 @@ export default class SetsController {
       const remainingRequests = limit - totalRequests
       console.log(remainingRequests)
 
-      if (await !bouncer.allows(isAdmin)) {
+      if (!(await bouncer.allows(isAdmin))) {
         if (remainingRequests <= 0) {
           return response.tooManyRequests({
             message: 'Rate limit exceeded. Try again tomorrow.',
@@ -140,7 +140,7 @@ export default class SetsController {
       })
     } catch (error) {
       // Handle validation errors and other potential errors
-      if (error.code === 'E_VALIDATION_FAILURE') {
+      if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
           message: 'Data Validation failed / The user could not be created',
           errors: error.message,
@@ -264,7 +264,7 @@ export default class SetsController {
       }
 
       // Handle validation errors
-      if (error.code === 'E_VALIDATION_FAILURE') {
+      if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
           message: 'Data Validation failed',
           errors: error.message,

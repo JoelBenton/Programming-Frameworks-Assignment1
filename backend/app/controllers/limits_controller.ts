@@ -20,7 +20,7 @@ export default class LimitsController {
 
       return response.ok({ message: 'Daily limit updated', newLimit })
     } catch (error) {
-      if (error.code === 'E_VALIDATION_FAILURE') {
+      if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
           message: 'Data Validation failed / The limit could not be updated',
           error: error.message,
