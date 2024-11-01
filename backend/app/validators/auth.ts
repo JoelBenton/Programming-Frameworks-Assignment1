@@ -13,6 +13,6 @@ export const registerValidator = vine.compile(
 export const loginValidator = vine.compile(
   vine.object({
     username: vine.string(),
-    password: vine.string().minLength(6).maxLength(32),
+    password: vine.string().minLength(6).maxLength(512),
   })
 )
