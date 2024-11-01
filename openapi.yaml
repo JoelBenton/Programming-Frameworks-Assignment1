@@ -31,6 +31,20 @@ paths:
       summary: "Login"
       tags:
         - "General"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:           
+                username:
+                  type: "string"
+                  example: "JohnDoe"
+                password:
+                  type: "string"
+                  example: "password1"
+
+
       responses:
         "200":
           description: "Successfully logged in"
@@ -42,13 +56,13 @@ paths:
                   - $ref: "#/components/schemas/Token"
                   - $ref: "#/components/schemas/User"
         "400":
-          description: "Invalid user credentials"
+          description: "Validation Failed"
           content:
             application/json:
               schema: 
                 $ref: "#/components/schemas/Error"
-        "422":
-          description: "Unprocessable Entity: Validator Error (Missing or invalid options passed in)"
+        "403":
+          description: "Invalid Credentials"
           content:
             application/json:
               schema: 
@@ -58,6 +72,18 @@ paths:
       summary: "Register"
       tags:
         - "General"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:           
+                username:
+                  type: "string"
+                  example: "JohnDoe"
+                password:
+                  type: "string"
+                  example: "password1"
       responses:
         "201":
           description: "Successfully registered"
@@ -78,8 +104,8 @@ paths:
                   id:
                     type: "integer"
                     example: 1
-        "422":
-          description: "Unprocessable Entity: Validator Error (Missing or invalid options passed in)"
+        "403":
+          description: "Invalid Credentials / User already exists"
           content:
             application/json:
               schema: 
@@ -100,7 +126,7 @@ paths:
                   message:
                     type: string
                     example: "Logged Out"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:
