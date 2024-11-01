@@ -31,6 +31,20 @@ paths:
       summary: "Login"
       tags:
         - "General"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:           
+                username:
+                  type: "string"
+                  example: "JohnDoe"
+                password:
+                  type: "string"
+                  example: "password1"
+
+
       responses:
         "200":
           description: "Successfully logged in"
@@ -42,13 +56,13 @@ paths:
                   - $ref: "#/components/schemas/Token"
                   - $ref: "#/components/schemas/User"
         "400":
-          description: "Invalid user credentials"
+          description: "Validation Failed"
           content:
             application/json:
               schema: 
                 $ref: "#/components/schemas/Error"
-        "422":
-          description: "Unprocessable Entity: Validator Error (Missing or invalid options passed in)"
+        "403":
+          description: "Invalid Credentials"
           content:
             application/json:
               schema: 
@@ -58,6 +72,18 @@ paths:
       summary: "Register"
       tags:
         - "General"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:           
+                username:
+                  type: "string"
+                  example: "JohnDoe"
+                password:
+                  type: "string"
+                  example: "password1"
       responses:
         "201":
           description: "Successfully registered"
@@ -78,8 +104,8 @@ paths:
                   id:
                     type: "integer"
                     example: 1
-        "422":
-          description: "Unprocessable Entity: Validator Error (Missing or invalid options passed in)"
+        "403":
+          description: "Invalid Credentials / User already exists"
           content:
             application/json:
               schema: 
@@ -142,7 +168,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -215,7 +241,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -238,7 +264,7 @@ paths:
       responses:
         "204":
           description: "The flashcard set was deleted"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -262,7 +288,7 @@ paths:
       responses:
         "200":
           description: "Limit Updated"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -340,7 +366,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Comment"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -413,10 +439,16 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-              - $ref: "#/components/schemas/User"
-              - type: object
                 properties:
+                  username:
+                    type: "string"
+                    example: "johndoe"
+                  admin:
+                    type: "boolean"
+                    example: false
+                    default: false
+                    nullable: true
+                    description: "The set creation limit should only apply to non-admin users"
                   password:
                     type: "string"
                     format: "password"
@@ -435,7 +467,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -480,15 +512,18 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-              - $ref: "#/components/schemas/User"
-              - type: object
                 properties:
+                  username:
+                    type: "string"
+                    example: "Username"
                   password:
                     type: "string"
                     format: "password"
                     example: "password"
                     nullable: true
+                  admin:
+                    type: "boolean"
+                    example: false
       responses:
         "200":
           description: "The updated user"
@@ -496,7 +531,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-        "401":
+        "400":
+          description: "Validation Error"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: Data Validation Error
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -519,7 +564,7 @@ paths:
       responses:
         "204":
           description: "The user was deleted"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
@@ -841,7 +886,7 @@ paths:
                       username:
                         type: "string"
                         example: "john_doe"
-        "401":
+        "403":
           description: "Unauthorised"
           content:
             application/json:
