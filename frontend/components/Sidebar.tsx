@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { icons } from 'lucide-react';
 import Icon from "./Icon";
-import type { SessionPayload } from "@/lib/auth";
+import type { SessionPayload } from "@/lib/definitions";
 import { useRouter, usePathname } from 'next/navigation';
 import { logout } from "@/lib/auth";
 

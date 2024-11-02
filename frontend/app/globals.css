@@ -6,6 +6,10 @@
   --background-colour: #09092c
 }
 
+::-webkit-scrollbar-thumb {
+  background: #727070; /* Color of the track */
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

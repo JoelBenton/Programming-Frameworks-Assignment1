@@ -2,26 +2,10 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import { createSession, deleteSession } from "@/lib/session";
+import type { Credentials, SessionPayload, CurrentUser } from "@/lib/definitions";
 
 const secretKey = process.env.SECRET_KEY || ''
 const key = new TextEncoder().encode(secretKey);
-
-export type Credentials = {
-  username: string,
-  password: string,
-}
-
-export type User = {
-  id: number,
-  username: string,
-  admin: boolean,
-  token: string,
-}
-
-export type SessionPayload = {
-  user: User,
-  expires: Date
-}
 
 export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
@@ -86,7 +70,7 @@ export async function login(credentials: Credentials) {
       console.log(data)
 
       // Verify credentials && get the user
-      const user: User = {
+      const user: CurrentUser = {
         id: data.id,
         username: data.username,
         admin: data.admin,

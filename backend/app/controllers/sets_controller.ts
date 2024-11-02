@@ -91,7 +91,6 @@ export default class SetsController {
       let admin = false
 
       const remainingRequests = limit - totalRequests
-      console.log(remainingRequests)
 
       if (!(await bouncer.allows(isAdmin))) {
         if (remainingRequests <= 0) {

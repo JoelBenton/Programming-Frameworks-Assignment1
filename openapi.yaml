@@ -949,6 +949,9 @@ components:
         name:
           type: "string"
           example: "European Capitals"
+        user_id:
+          type: "number"
+          example: 1
         cards:
           type: "array"
           items:
