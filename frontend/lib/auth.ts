@@ -1,7 +1,7 @@
 'use server'
 
 import { SignJWT, jwtVerify } from "jose";
-import { createSession, deleteSession } from "@/lib/session";
+import { createSession, deleteSession, getSession } from "@/lib/session";
 import type { Credentials, SessionPayload, CurrentUser } from "@/lib/definitions";
 
 const secretKey = process.env.SECRET_KEY || ''
@@ -95,4 +95,12 @@ export async function login(credentials: Credentials) {
 }
 export async function logout() {
   deleteSession()
+}
+
+export async function checkSession() {
+  const session = await getSession()
+  if (!session) {
+    return false
+    }
+    else return true
 }

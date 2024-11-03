@@ -10,19 +10,21 @@ import { logout } from "@/lib/auth";
 const Sidebar = ({ session }: { session: string | null}) => {
   const Menus: { title: string, icon: keyof typeof icons, gap?: boolean, path: string[] }[] = [
     { title: "Home", icon: "House", path: ["/"] },
+    { title: "Collections", icon: "House", path: ["/collections"] },
     { title: "Your Library", icon: "BriefcaseBusiness", path: ["/library"] },
-    { title: "Flashcards", icon: "BriefcaseBusiness", gap: true, path: ["/flashcards"] },
-    { title: "Collections", icon: "PanelsTopLeft", path: ["/collections"] },
-    { title: "Settings", icon: "Cog", gap: true, path: ["/settings"] },
   ];
 
   if (session) {
     const data: SessionPayload = JSON.parse(session);
+    Menus.push({ title: "Create Flashcards", icon: "BriefcaseBusiness", gap: true, path: ["/flashcards/create"] })
+    Menus.push({ title: "Create Collections", icon: "PanelsTopLeft", path: ["/collections/create"] }),
+    Menus.push({ title: "Settings", icon: "Cog", gap: true, path: ["/settings"] },)
     Menus.push({ title: "Account", icon: "CircleUser", path: ["/account"] });
     if (data.user.admin === true) {
       Menus.push({ title: "Admin", icon: "ServerCog", path: ["/admin"] });
     }
   } else {
+    Menus.push({ title: "Settings", icon: "Cog", gap: true, path: ["/settings"] })
     Menus.push({ title: "Sign in", icon: "CircleUser", path: ["/login","/register"] });
   }
 

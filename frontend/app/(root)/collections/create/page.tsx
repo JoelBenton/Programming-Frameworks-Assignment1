@@ -1,10 +1,10 @@
 import React from 'react'
 
-const page = async () => {
-
+const page = () => {
+  
   return (
     <div>
-      Admin
+      Create collection
     </div>
   )
 }
