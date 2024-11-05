@@ -1,12 +1,20 @@
+import { SessionProvider } from "@/components/context/SessionContext";
 import { checkSession } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import type { SessionPayload } from "@/lib/definitions";
 import React from "react";
 
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   (await checkSession()) || redirect('/');
+  const session = await getSession() ?? ''
+  const parsedSession = JSON.parse(session) as SessionPayload
+  
     return (
-      <main>
-        {children}
-      </main>
+      <SessionProvider initialSession={parsedSession}>
+        <main>
+          {children}
+        </main>
+      </SessionProvider>
     )
 }

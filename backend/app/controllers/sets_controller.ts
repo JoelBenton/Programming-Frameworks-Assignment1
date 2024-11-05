@@ -141,7 +141,7 @@ export default class SetsController {
       // Handle validation errors and other potential errors
       if (error.code === 'E_VALIDATION_ERROR') {
         return response.badRequest({
-          message: 'Data Validation failed / The user could not be created',
+          message: 'Data Validation failed / The flashcard set could not be created',
           errors: error.message,
         })
       }

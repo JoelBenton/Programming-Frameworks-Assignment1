@@ -15,7 +15,7 @@ export type SessionPayload = {
   expires: Date
 }
 
-export type flashcard = {
+export type Flashcard = {
   id: number,
   name: string,
   user_id: number,
@@ -33,4 +33,9 @@ export type User = {
   id: number,
   username: string,
   admin: boolean,
+}
+
+export type Comment = {
+  comment: string,
+  author: User,
 }

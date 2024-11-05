@@ -67,8 +67,6 @@ export async function login(credentials: Credentials) {
     if (response.ok) {
       const data = await response.json()
 
-      console.log(data)
-
       // Verify credentials && get the user
       const user: CurrentUser = {
         id: data.id,

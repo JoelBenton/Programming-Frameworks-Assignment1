@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { icons } from 'lucide-react';
 import Icon from "./Icon";
 import type { SessionPayload } from "@/lib/definitions";
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, redirect } from 'next/navigation';
 import { logout } from "@/lib/auth";
 
 const Sidebar = ({ session }: { session: string | null}) => {
@@ -35,13 +36,12 @@ const Sidebar = ({ session }: { session: string | null}) => {
   const [isVisible, setIsVisible] = useState(open);
 
   useEffect(() => {
-    const currentMenu = Menus.find(menu => menu.path.includes(pathname));
-    if (currentMenu) {
-      setCurrentPage(currentMenu.title);
-    } else {
-      setCurrentPage("Home");
-    }
-  }, [pathname]);
+    const currentMenu = Menus.find(menu => {
+      return menu.path.includes(pathname);
+    });
+  
+    setCurrentPage(currentMenu ? currentMenu.title : ""); 
+  }, [pathname, session]);
 
   useEffect(() => {
     if (open) {
@@ -87,7 +87,10 @@ const Sidebar = ({ session }: { session: string | null}) => {
         <div className="pb-4">
           {session && (
             <button
-              onClick={() => logout()}
+              onClick={() => {
+                logout()
+                redirect('/')
+              }}
               className="flex items-center p-2 rounded-md text-gray-300 text-sm hover:bg-gray-500 hover:rounded-xl gap-x-4 w-full"
             >
               <Icon name="LogOut" />

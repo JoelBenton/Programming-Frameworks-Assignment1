@@ -1,24 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import Pagination from "@/components/Pagination"; // Adjust the import path as necessary
-import Flashcard from "@/components/Flashcard"; // Adjust the import path for Flashcard
+import Pagination from "@/components/Pagination";
 
-import flashcards from './testData.json';
-import { flashcard } from "@/lib/definitions";
+import { Flashcard as FlashcardType } from "@/lib/definitions";
+import { redirect } from "next/navigation";
+import { useFlashcardSetsData } from "@/components/context/FlashcardSetsContext";
+import Flashcard from "@/components/Flashcard";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const flashcardSets = useFlashcardSetsData() as FlashcardType[]
   
   // Sample flashcard data
-  const loadedFlashcards: flashcard[] = flashcards.map((flashcard) => ({
+  const loadedFlashcards: FlashcardType[] = flashcardSets.map((flashcard) => ({
     ...flashcard,
     created_at: new Date(flashcard.created_at),
     updated_at: new Date(flashcard.updated_at),
   }));
 
-  const [selectedFlashcard, setSelectedFlashcard] = useState<flashcard | null>(loadedFlashcards.length > 0 ? loadedFlashcards[0] : null);
+  const [selectedFlashcard, setSelectedFlashcard] = useState<FlashcardType | null>(loadedFlashcards.length > 0 ? loadedFlashcards[0] : null);
 
   const users = [
     { id: 1, username: "Bobby", admin: false },
@@ -32,7 +35,7 @@ export default function Home() {
   useEffect(() => {
     const totalFlashcards = loadedFlashcards.length;
     setTotalPages(Math.ceil(totalFlashcards / itemsPerPage));
-  }, [flashcards, itemsPerPage]);
+  }, [flashcardSets, itemsPerPage, loadedFlashcards.length]);
 
   // Calculate which flashcards to display based on the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -42,7 +45,7 @@ export default function Home() {
     setCurrentPage(page);
   };
 
-  const handlePreviewCards = (flashcardData: flashcard) => {
+  const handlePreviewCards = (flashcardData: FlashcardType) => {
     setSelectedFlashcard(flashcardData);
   };
 
@@ -80,7 +83,7 @@ export default function Home() {
             <div>
               <div className="flex flex-row w-full justify-between items-center">
                 <p className="text-6xl font-bold mb-2 text-gray-500">{selectedFlashcard.name}</p>
-                <button className="flex items-center h-1/2 p-1 bg-[#b3c7f9] border-gray-600 border-2 text-white px-4 rounded-xl hover:bg-[#8aabfe]">
+                <button onClick={() => {redirect(`/flashcards/${selectedFlashcard.id}`)}} className="flex items-center h-1/2 p-1 bg-[#b3c7f9] border-gray-600 border-2 text-white px-4 rounded-xl hover:bg-[#8aabfe]">
                   Study
                 </button>
               </div>
