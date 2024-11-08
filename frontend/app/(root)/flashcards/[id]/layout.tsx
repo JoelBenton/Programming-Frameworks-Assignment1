@@ -4,6 +4,7 @@ import React from "react";
 import { FlashcardCommentSetProvider } from "@/components/context/FlashcardCommentSetContext";
 import { SessionProvider } from "@/components/context/SessionContext";
 import { SessionPayload } from "@/lib/definitions";
+import ErrorPage from "@/components/ErrorPage";
 
 interface Params {
   params: {
@@ -31,16 +32,19 @@ export default async function Layout({
     });
 
     if (!response.ok) {
-      if (response.status === 404) {
-        redirect("/404");
-      } else if (response.status === 403) {
-        redirect("/login");
-      } else {
-        redirect("/error");
-      }
-    }
+      if (response.status === 403) {
+         redirect("/login");
+       } else {
+         return (<ErrorPage />)
+       }
+     }
 
     const flashcardData = await response.json();
+
+    if (!flashcardData) {
+      alert('Failed to find flashcard, Try again later')
+      redirect('/');
+    }
 
     return (
       <FlashcardCommentSetProvider flashcardData={flashcardData.data}>

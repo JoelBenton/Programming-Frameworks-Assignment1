@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
 
-import { Flashcard as FlashcardType } from "@/lib/definitions";
-import { redirect } from "next/navigation";
+import { FlashcardSet as FlashcardType } from "@/lib/definitions";
+import { useRouter } from "next/navigation";
 import { useFlashcardSetsData } from "@/components/context/FlashcardSetsContext";
 import Flashcard from "@/components/Flashcard";
 
@@ -13,6 +13,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
 
   const flashcardSets = useFlashcardSetsData() as FlashcardType[]
+  const router = useRouter()
   
   // Sample flashcard data
   const loadedFlashcards: FlashcardType[] = flashcardSets.map((flashcard) => ({
@@ -83,7 +84,7 @@ export default function Home() {
             <div>
               <div className="flex flex-row w-full justify-between items-center">
                 <p className="text-6xl font-bold mb-2 text-gray-500">{selectedFlashcard.name}</p>
-                <button onClick={() => {redirect(`/flashcards/${selectedFlashcard.id}`)}} className="flex items-center h-1/2 p-1 bg-[#b3c7f9] border-gray-600 border-2 text-white px-4 rounded-xl hover:bg-[#8aabfe]">
+                <button onClick={() => {router.push(`/flashcards/${selectedFlashcard.id}`)}} className="flex items-center h-1/2 p-1 bg-[#b3c7f9] border-gray-600 border-2 text-white px-4 rounded-xl hover:bg-[#8aabfe]">
                   Study
                 </button>
               </div>

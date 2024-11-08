@@ -126,7 +126,10 @@ export default class UsersController {
 
       // Update the user fields with validated data
       user.username = payload.username
-      user.password = payload.password
+      if (payload.password) {
+        user.password = payload.password
+      }
+
       if (payload.admin) {
         if (await bouncer.allows(isAdmin)) {
           user.admin = payload.admin

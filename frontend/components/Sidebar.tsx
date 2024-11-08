@@ -1,22 +1,23 @@
+"use client"
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-"use client";
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { icons } from 'lucide-react';
 import Icon from "./Icon";
 import type { SessionPayload } from "@/lib/definitions";
-import { useRouter, usePathname, redirect } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { logout } from "@/lib/auth";
 
 const Sidebar = ({ session }: { session: string | null}) => {
   const Menus: { title: string, icon: keyof typeof icons, gap?: boolean, path: string[] }[] = [
     { title: "Home", icon: "House", path: ["/"] },
     { title: "Collections", icon: "House", path: ["/collections"] },
-    { title: "Your Library", icon: "BriefcaseBusiness", path: ["/library"] },
   ];
 
   if (session) {
     const data: SessionPayload = JSON.parse(session);
+    Menus.push({ title: "Your Library", icon: "BriefcaseBusiness", path: ["/library"] },)
     Menus.push({ title: "Create Flashcards", icon: "BriefcaseBusiness", gap: true, path: ["/flashcards/create"] })
     Menus.push({ title: "Create Collections", icon: "PanelsTopLeft", path: ["/collections/create"] }),
     Menus.push({ title: "Settings", icon: "Cog", gap: true, path: ["/settings"] },)
@@ -89,7 +90,6 @@ const Sidebar = ({ session }: { session: string | null}) => {
             <button
               onClick={() => {
                 logout()
-                redirect('/')
               }}
               className="flex items-center p-2 rounded-md text-gray-300 text-sm hover:bg-gray-500 hover:rounded-xl gap-x-4 w-full"
             >

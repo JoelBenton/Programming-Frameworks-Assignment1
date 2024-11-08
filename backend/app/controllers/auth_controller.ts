@@ -11,7 +11,7 @@ export default class AuthController {
       return response.created(user)
     } catch (error) {
       if (error.code === 'E_VALIDATION_ERROR') {
-        return response.forbidden({ message: 'Validation failed', errors : error.messages })
+        return response.forbidden({ message: 'Validation failed', errors: error.messages })
       }
       return response.internalServerError({ message: 'Registration failed', error: error.message })
     }

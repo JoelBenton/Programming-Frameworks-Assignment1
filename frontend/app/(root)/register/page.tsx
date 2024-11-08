@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { register } from "@/lib/auth";
 import { authInput } from "@/validators/auth";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const Page = () => {
@@ -15,6 +15,7 @@ const Page = () => {
     general: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter()
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +29,7 @@ const Page = () => {
     const result = await authInput.safeParseAsync(formData);
 
     if (!result.success) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fieldErrors = result.error.errors.reduce((acc: any, curr: any) => {
         acc[curr.path[0]] = acc[curr.path[0]] ? [...acc[curr.path[0]], curr.message] : [curr.message];
         return acc;
@@ -39,7 +41,7 @@ const Page = () => {
 
       if (result.success) {
         alert('Registration Successful!');
-        redirect('/login');
+        router.push('/login');
       } 
       else if (result.username) {
         // Set the specific username error from the server response

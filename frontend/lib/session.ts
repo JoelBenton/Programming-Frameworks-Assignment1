@@ -4,7 +4,7 @@ import type { CurrentUser } from '@/lib/definitions'
 
 export async function createSession(user: CurrentUser) {
   // Create the session
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const expires = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000))
   const session = await encrypt({ user, expires });
 
   // Save the session in a cookie
@@ -27,7 +27,7 @@ export async function updateSession() {
     return null
   }
 
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const expires = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000))
 
   const cookieStore = await cookies()
   cookieStore.set('session', session, {

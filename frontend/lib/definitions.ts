@@ -16,15 +16,17 @@ export type SessionPayload = {
 }
 
 export type Flashcard = {
+  id?: number,
+  question: string,
+  answer: string,
+  difficulty: string
+}
+
+export type FlashcardSet = {
   id: number,
   name: string,
   user_id: number,
-  cards: {
-    id: number,
-    question: string,
-    answer: string,
-    difficulty: string
-  }[],
+  cards: Flashcard[],
   created_at: Date
   updated_at: Date
 }

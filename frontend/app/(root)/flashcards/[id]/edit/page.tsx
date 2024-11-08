@@ -1,19 +1,25 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import { useSession } from '@/components/context/SessionContext'
 import { setsInput } from '@/validators/sets'
 import { Trash2Icon } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import type { FlashcardSet } from '@/lib/definitions'
+import { useFlashcardCommentSetData } from '@/components/context/FlashcardCommentSetContext'
+import ErrorPage from '@/components/ErrorPage'
 
 const Page = () => {
   const session = useSession()
+  const flashcardSet = useFlashcardCommentSetData()
 
-  const [title, setTitle] = useState("")
-  const [cards, setCards] = useState(
-    Array(5).fill({ question: "", answer: "", difficulty: "medium" })
-  )
+  if (!flashcardSet) {
+    return <ErrorPage />
+  }
+
+  const [title, setTitle] = useState(flashcardSet.name)
+  const [cards, setCards] = useState(flashcardSet.cards)
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false)
   const [validatedData, setValidatedData] = useState<FlashcardSet | null>(null)
@@ -50,7 +56,7 @@ const Page = () => {
       setLoading(false)
       return;
     }
-    setError(null); // Clear error if at least one card exists
+    setError(null);
   
     const result = setsInput.safeParse({
       name: title,
@@ -85,8 +91,8 @@ const Page = () => {
       if (!loading || !validatedData) return;
 
       try {
-        const response = await fetch('http://localhost:3333/api/sets', {
-          method: 'POST',
+        const response = await fetch(`http://localhost:3333/api/sets/${flashcardSet.id}`, {
+          method: 'PUT',
           headers: { 
             'content-type': 'application/json',
             'Authorization': `Bearer ${session?.user.token}`
@@ -95,8 +101,7 @@ const Page = () => {
         });
 
         if (response.ok) {
-          const data = await response.json()
-          router.push(`/flashcards/${data.data.id}`)
+          window.location.href = `/flashcards/${flashcardSet.id}` // Causes a Refresh of data over entire website to occur.
         } else if (response.status === 403) {
           setError('User not authorised to make Flashcard Sets! Please login first.')
         } else if (response.status === 429) {
@@ -113,10 +118,37 @@ const Page = () => {
     fetchData();
   }, [loading, validatedData]);
 
+  const handleDeleteSet = async () => {
+    if (!confirm("Are you sure you want to delete this flashcard set?")) {
+      return; // Exit if user cancels
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3333/api/sets/${flashcardSet.id}`, {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${session?.user.token}`
+        }
+      });
+
+      if (response.ok) {
+        alert("Flashcard set deleted successfully.");
+        window.location.href = '/library'
+      } else {
+        setError("Failed to delete the flashcard set.");
+      }
+    } catch (error) {
+      console.error("Error deleting set:", error);
+      setError("An unexpected error occurred.");
+    }
+  }
+
+
   return (
     <div className="flex justify-center items-start min-h-screen py-10 overflow-auto">
       <div className="flex w-3/5 h-full flex-col items-start p-6 shadow-xl rounded-3xl">
-        <div className='p-3 pt-10 w-full pb-10 text-4xl font-bold'>Create a new flashcard set</div>
+        <div className='p-3 pt-10 w-full pb-10 text-4xl font-bold'>Update flashcard set</div>
         
         <input
           className='w-full h-12 rounded-xl bg-gradient-to-r from-[#ddf8ec] to-[#b3c7f9] text-black p-2'
@@ -170,8 +202,14 @@ const Page = () => {
             onClick={handleCreateCard}
             className='w-[200px] h-10 rounded-xl bg-blue-500 text-white p-2'
           >
-            Create Flashcard
+            Update Flashcard
           </button>
+          <button
+            onClick={handleDeleteSet}
+            className="w-[200px] h-10 bg-red-500 text-white py-2 px-4 rounded-xl ml-5"
+          >
+          Delete Flashcard Set
+        </button>
         </div>
       </div>
     </div>

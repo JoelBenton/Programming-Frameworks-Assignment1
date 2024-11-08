@@ -4,6 +4,7 @@ import { useFlashcardCommentSetData } from '@/components/context/FlashcardCommen
 import React, { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import { useSession } from '@/components/context/SessionContext';
+import { useRouter } from 'next/navigation';
 
 const FlashcardPage = () => {
   const flashcardSet = useFlashcardCommentSetData();
@@ -13,33 +14,92 @@ const FlashcardPage = () => {
   const [newComment, setNewComment] = useState("");
   const [canComment, setCanComment] = useState(false);
   const [comments, setComments] = useState(flashcardSet?.comments || []);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [submitComment, setSubmitComment] = useState(false);
 
   const session = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     setCanComment(!!session);
   }, [session]);
 
+  useEffect(() => {
+    if (submitComment) {
+      const postComment = async () => {
+        try {
+          console.log(session?.user.id != flashcardSet?.user_id)
+          if (!canComment && session?.user.id != flashcardSet?.user_id) {
+            setErrorMessage('Please sign in to send Comment')
+            return
+          }
+          if (!session) {
+            setErrorMessage('Please sign in to send Comment')
+            return
+          }
+          if (!flashcardSet) {
+            setErrorMessage('Failed to retrieve Flashcard Set information! Refresh page and try again.')
+            return
+          }
+          const response = await fetch(`http://localhost:3333/api/set/${flashcardSet.id}/comment`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session?.user.token}`,
+            },
+            body: JSON.stringify({
+              message: newComment,
+              user_id: session?.user.id,
+            }),
+          });
+    
+          if (!response.ok) {
+            setErrorMessage('Failed to post comment. Please try again later.');
+            console.error('Failed to post comment:', await response.text());
+          } else {
+            setComments((prevComments) => [
+              ...prevComments,
+              { comment: newComment, author: { id: session.user.id, username: session.user.username, admin: session.user.admin } },
+            ]);
+            setNewComment("");
+          }
+        } catch (error) {
+          setErrorMessage('An error occurred while posting the comment.');
+          console.error('Error posting comment:', error);
+        } finally {
+          setSubmitComment(false);
+        }
+      };
+
+      postComment();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitComment, newComment, session]);
+
   if (!flashcardSet) {
-    return <></>;
+    router.back()
+    return
   }
 
-  const currentCard = flashcardSet.cards[currentCardIndex];
+  const handleEditRedirect = () => {
+    router.push(`/flashcards/${flashcardSet.id}/edit`)
+  }
 
   const handleAddComment = () => {
     if (!session) {
-      return
+      setErrorMessage('You need to be logged in to comment.');
+      return;
     }
-      
+
     if (newComment.trim()) {
-      const updatedComments = [
-        ...comments,
-        { comment: newComment, author: { id: session.user.id, username: session.user.username, admin: session.user.admin } },
-      ];
-      setComments(updatedComments);
-      setNewComment("");
+      setSubmitComment(true);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Comment cannot be empty.');
     }
   };
+
+  const currentCard = flashcardSet.cards[currentCardIndex];
 
   return (
     <div className="flex flex-col h-full w-full overflow-y-auto items-center">
@@ -68,6 +128,12 @@ const FlashcardPage = () => {
               setCurrentCardIndex(page - 1);
             }}
           />
+          <button
+            className="text-blue-500 font-semibold mt-4"
+            onClick={handleEditRedirect}
+          >
+            Edit Flashcard Set
+          </button>
         </div>
       </div>
 
@@ -81,6 +147,7 @@ const FlashcardPage = () => {
         
         {showComments && (
           <div className={`bg-gradient-to-br ${!showAnswer ? 'from-[#ddf8ec] to-[#b3c7f9]' : 'from-[#ffebcd] to-[#f08080]'} p-5 rounded-xl shadow-inner space-y-4`}>
+
             {comments.length > 0 ? (
               comments.map((comment, index) => (
                 <div key={index} className="p-3 border border-gray-500 rounded-xl last:border-none flex justify-between items-center">
@@ -98,24 +165,24 @@ const FlashcardPage = () => {
               <p className="text-gray-500">No comments available.</p>
             )}
 
-            {canComment ? (
+            {canComment && session?.user.id !== flashcardSet?.user_id ? (
               <div className="mt-4">
-              <textarea
-                className='w-full p-3 border rounded-lg text-black resize-none'
-                rows={3}
-                placeholder="Write a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              />
-              <button
-                className="mt-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg"
-                onClick={() => {handleAddComment()}}
-              >
-                Submit Comment
-              </button>
-            </div>
-            ) : (<p className='text-black font-bold text-xl'>Login to comment</p>)}
-            
+                <textarea
+                  className="w-full p-3 border rounded-lg text-black resize-none"
+                  rows={3}
+                  placeholder="Write a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+                {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+                <button
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg"
+                  onClick={handleAddComment}
+                >
+                  Submit Comment
+                </button>
+              </div>
+            ) : (session?.user.id === flashcardSet?.user_id ? <p></p> : <p className="text-black font-bold text-xl">Login to comment</p>)}
           </div>
         )}
       </div>

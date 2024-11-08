@@ -23,15 +23,13 @@ export default class CommentsController {
       }
 
       const comment = await Comment.create({
-        userId: data.userId,
+        userId: data.user_id,
         comment: data.message,
         flashcardSetId: flashcardSetId,
       })
       await comment.load('flashcardSet')
       await comment.load('user')
       await comment.flashcardSet.load('flashcards')
-
-      console.log(comment.flashcardSet)
 
       return response.created({
         comment: comment.comment,

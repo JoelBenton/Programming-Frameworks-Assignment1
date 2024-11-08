@@ -1,8 +1,8 @@
 'use client'
 import React, { createContext, useContext, useState } from "react";
-import type { Flashcard } from "@/lib/definitions"; // replace with correct path
+import type { FlashcardSet } from "@/lib/definitions"; // replace with correct path
 
-const FlashcardSetsContext = createContext<Flashcard[] | null>(null);
+const FlashcardSetsContext = createContext<FlashcardSet[] | null>(null);
 
 export const useFlashcardSetsData = () => {
   return useContext(FlashcardSetsContext);
@@ -10,12 +10,12 @@ export const useFlashcardSetsData = () => {
 
 type SessionProviderProps = {
   children: React.ReactNode;
-  flashcardData: (Flashcard[] ) | null;
+  flashcardData: (FlashcardSet[] ) | null;
 };
 
 export const FlashcardSetsProvider: React.FC<SessionProviderProps> = ({ children, flashcardData }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [flashcardSet, setFlashcardSet] = useState<Flashcard[] | null>(flashcardData);
+  const [flashcardSet, setFlashcardSet] = useState<FlashcardSet[] | null>(flashcardData);
 
   return (
     <FlashcardSetsContext.Provider value={flashcardSet}>

@@ -1,11 +1,11 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { flashcard, User } from "@/lib/definitions";
+import { FlashcardSet, User } from "@/lib/definitions";
 
 interface FlashcardProps {
-  flashcard: flashcard,
+  flashcard: FlashcardSet,
   user: User,
-  onSubmit: (data: flashcard) => void;
+  onSubmit: (data: FlashcardSet) => void;
 }
 
 const Flashcard: React.FC<FlashcardProps> = ({

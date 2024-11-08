@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 
 export const commentValidator = vine.compile(
   vine.object({
-    userId: vine.number(),
+    user_id: vine.number(),
     message: vine.string(),
   })
 )
