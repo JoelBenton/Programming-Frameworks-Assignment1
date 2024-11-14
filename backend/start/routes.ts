@@ -38,10 +38,7 @@ router
     router.post('/users', [UsersController, 'store']).use(middleware.auth())
     router.post('/sets', [SetsController, 'store']).use(throttle).use(middleware.auth())
     router.post('sets/update-limit', [LimitsController, 'updateLimit']).use(middleware.auth())
-    router.get('sets/get-limit', [LimitsController, 'getLimit'])
-    router
-      .get('sets/get-remaining-requests', [LimitsController, 'getRemainingRequests'])
-      .use(middleware.auth())
+    router.get('/sets/get-limit-info', [LimitsController, 'getLimitInfo'])
 
     router
       .resource('sets', SetsController)

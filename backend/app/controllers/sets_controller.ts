@@ -5,7 +5,7 @@ import { flashcardSetsValidator } from '#validators/flashcard_set'
 import type { HttpContext } from '@adonisjs/core/http'
 import Redis from '@adonisjs/redis/services/main'
 
-const totalRequestsKey = 'global:total_requests'
+const totalRequestsKey = 'global_total_requests'
 const limitKey = 'global_daily_limit'
 
 function returnFlashcardSetData(flashcardSetData: FlashcardSet) {
@@ -129,6 +129,7 @@ export default class SetsController {
       await flashcardSet.load('flashcards')
 
       if (!admin) {
+        console.log('adding 1 to totalRequests')
         Redis.set(totalRequestsKey, totalRequests + 1)
       }
 

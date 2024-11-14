@@ -27,7 +27,17 @@ export type FlashcardSet = {
   name: string,
   user_id: number,
   cards: Flashcard[],
-  created_at: Date
+  created_at: Date,
+  updated_at: Date
+}
+
+export type FlashcardCommentSet = {
+  id: number,
+  name: string,
+  user_id: number,
+  cards: Flashcard[],
+  comments: Comment[],
+  created_at: Date,
   updated_at: Date
 }
 

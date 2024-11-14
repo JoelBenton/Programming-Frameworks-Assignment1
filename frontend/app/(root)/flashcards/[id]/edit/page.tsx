@@ -4,27 +4,48 @@
 import { useSession } from '@/components/context/SessionContext'
 import { setsInput } from '@/validators/sets'
 import { Trash2Icon } from 'lucide-react'
-import { redirect, useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import type { FlashcardSet } from '@/lib/definitions'
 import { useFlashcardCommentSetData } from '@/components/context/FlashcardCommentSetContext'
 import ErrorPage from '@/components/ErrorPage'
+import { sleep } from '@/lib/utils'
 
 const Page = () => {
-  const session = useSession()
-  const flashcardSet = useFlashcardCommentSetData()
+  const router = useRouter()
+  const params = useParams()
+  const { session } = useSession() || {};
+  const { flashcardCommentSet, loadFlashcardCommentSet } = useFlashcardCommentSetData()
 
-  if (!flashcardSet) {
+  useEffect(() => {
+    loadFlashcardCommentSet(String(params.id))
+  }, [session, loadFlashcardCommentSet]);
+
+  if (!session) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-gray-700 bg-gray-100 p-4 rounded-xl shadow-xl">
+          Please <span className="font-bold text-blue-600" onClick={() => router.push('/login')}>Login</span> to edit a Flashcard Set
+        </p>
+      </div>
+    );
+  }
+
+  if (!flashcardCommentSet) {
     return <ErrorPage />
   }
 
-  const [title, setTitle] = useState(flashcardSet.name)
-  const [cards, setCards] = useState(flashcardSet.cards)
+  if (session?.user.id !== flashcardCommentSet.user_id) {
+    router.back()
+  }
+
+  const [title, setTitle] = useState(flashcardCommentSet.name)
+  const [cards, setCards] = useState(flashcardCommentSet.cards)
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false)
   const [validatedData, setValidatedData] = useState<FlashcardSet | null>(null)
 
-  const router = useRouter()
+  
 
   const handleCardChange = (index: number, field: string, value: string) => {
     setError(null)
@@ -91,7 +112,7 @@ const Page = () => {
       if (!loading || !validatedData) return;
 
       try {
-        const response = await fetch(`http://localhost:3333/api/sets/${flashcardSet.id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/sets/${flashcardCommentSet.id}`, {
           method: 'PUT',
           headers: { 
             'content-type': 'application/json',
@@ -101,7 +122,7 @@ const Page = () => {
         });
 
         if (response.ok) {
-          window.location.href = `/flashcards/${flashcardSet.id}` // Causes a Refresh of data over entire website to occur.
+          router.back()
         } else if (response.status === 403) {
           setError('User not authorised to make Flashcard Sets! Please login first.')
         } else if (response.status === 429) {
@@ -124,7 +145,7 @@ const Page = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3333/api/sets/${flashcardSet.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/sets/${flashcardCommentSet.id}`, {
         method: 'DELETE',
         headers: {
           'content-type': 'application/json',
@@ -134,7 +155,7 @@ const Page = () => {
 
       if (response.ok) {
         alert("Flashcard set deleted successfully.");
-        window.location.href = '/library'
+        router.push('/')
       } else {
         setError("Failed to delete the flashcard set.");
       }

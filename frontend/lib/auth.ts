@@ -1,17 +1,17 @@
-'use server'
+'use client'
 
 import { SignJWT, jwtVerify } from "jose";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import type { Credentials, SessionPayload, CurrentUser } from "@/lib/definitions";
 
-const secretKey = process.env.SECRET_KEY || ''
+const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("1 week from now")
+    .setExpirationTime("1 day from now")
     .sign(key);
 }
 
@@ -29,7 +29,7 @@ export async function decrypt(session: string | undefined = "") {
 
 export async function register(credentials: Credentials) {
   try {
-    const response = await fetch('http://localhost:3333/api/users/register', {
+    const response = await fetch('${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/register', {
       method: 'POST',
       headers: { 
         'content-type': 'application/json',
@@ -40,7 +40,6 @@ export async function register(credentials: Credentials) {
     console.log(await response.json())
 
     if (response.ok) {
-      const data = await response.json()
 
       return { success: true }
     }
@@ -58,7 +57,7 @@ export async function register(credentials: Credentials) {
 
 export async function login(credentials: Credentials) {
   try {
-    const response = await fetch('http://localhost:3333/api/users/login', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/login`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(credentials)
@@ -87,9 +86,6 @@ export async function login(credentials: Credentials) {
     console.error(error);
     return { success: false, error: 'Network error. Please try again later.' };
   }
-  
-
-  
 }
 export async function logout() {
   deleteSession()

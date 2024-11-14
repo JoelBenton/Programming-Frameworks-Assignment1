@@ -1,24 +1,52 @@
+// FlashcardSetsContext.tsx
 'use client'
-import React, { createContext, useContext, useState } from "react";
-import type { FlashcardSet } from "@/lib/definitions"; // replace with correct path
+import React, { createContext, useContext, useState, useCallback } from "react";
+import type { FlashcardSet } from "@/lib/definitions";
+import { fetchFlashcardSets, fetchUserFlashcardSets } from "@/lib/api";
 
-const FlashcardSetsContext = createContext<FlashcardSet[] | null>(null);
+// Define the context
+const FlashcardSetsContext = createContext<{
+  flashcardSets: FlashcardSet[] | null;
+  loadFlashcards: (apiType: 'user' | 'all', userId?: string) => Promise<void>;
+} | null>(null);
 
+// Hook to use the FlashcardSetsContext
 export const useFlashcardSetsData = () => {
-  return useContext(FlashcardSetsContext);
+  const context = useContext(FlashcardSetsContext);
+  if (!context) {
+    throw new Error("useFlashcardSetsData must be used within a FlashcardSetsProvider");
+  }
+  return context;
 };
 
-type SessionProviderProps = {
+// Define the provider props
+type FlashcardSetsProviderProps = {
   children: React.ReactNode;
-  flashcardData: (FlashcardSet[] ) | null;
 };
 
-export const FlashcardSetsProvider: React.FC<SessionProviderProps> = ({ children, flashcardData }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [flashcardSet, setFlashcardSet] = useState<FlashcardSet[] | null>(flashcardData);
+export const FlashcardSetsProvider: React.FC<FlashcardSetsProviderProps> = ({ children }) => {
+  // Local state to hold flashcard sets
+  const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[] | null>(null);
+
+  // Function to load flashcards based on API type
+  const loadFlashcards = useCallback(async (apiType: 'user' | 'all', userId?: string) => {
+    try {
+      let data: FlashcardSet[] | null = null;
+
+      if (apiType === 'user' && userId) {
+        data = await fetchUserFlashcardSets(userId);
+      } else {
+        data = await fetchFlashcardSets();
+      }
+
+      setFlashcardSets(data);
+    } catch (error) {
+      console.error("Error loading flashcards", error);
+    }
+  }, []);
 
   return (
-    <FlashcardSetsContext.Provider value={flashcardSet}>
+    <FlashcardSetsContext.Provider value={{ flashcardSets, loadFlashcards }}>
       {children}
     </FlashcardSetsContext.Provider>
   );

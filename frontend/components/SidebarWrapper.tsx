@@ -1,8 +1,9 @@
+'use client'
+
+import { useSession } from "./context/SessionContext";
 import Sidebar from "./Sidebar";
-import { getSession } from "@/lib/session";
 
-export default async function SidebarWrapper() {
-    const session = await getSession(); // Server-side call
-
-    return <Sidebar session={session} />;
+export default function SidebarWrapper() {
+  const { session, refreshSession } = useSession() || {};
+  return <Sidebar session={session} refreshSession={refreshSession} />;
 }

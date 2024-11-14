@@ -130,8 +130,9 @@ export default class UsersController {
         user.password = payload.password
       }
 
-      if (payload.admin) {
+      if (payload.admin !== undefined) {
         if (await bouncer.allows(isAdmin)) {
+          console.log('Updating Users admin permission : ' + payload.admin)
           user.admin = payload.admin
         } else {
           return response.forbidden({ message: 'User not Authenticated for this action!' })

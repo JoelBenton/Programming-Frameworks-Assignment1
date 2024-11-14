@@ -285,6 +285,14 @@ paths:
       summary: "Update Limit of Flashcard Sets that can be created each day."
       tags:
         - "FlashCard Sets"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                limit:
+                  type: "number"
+                  example: 25
       responses:
         "200":
           description: "Limit Updated"
@@ -300,7 +308,7 @@ paths:
                     example: "Unauthorized access"
         "404":
           description: "Limit not found"
-  /sets/get-limit:
+  /sets/get-limit-info:
     get:
       summary: "Get the current Limit of Flashcard Sets that can be created each day."
       tags:
@@ -315,25 +323,12 @@ paths:
                   limit:
                     type: "number"
                     example: 20
-        "404":
-          description: "Limit not found"
-  /sets/get-remaining-requests:
-    get:
-      summary: "Get the remaining Limit of Flashcard Sets that can be created each day."
-      tags:
-        - "FlashCard Sets"
-      responses:
-        "200":
-          description: "Remaining Flashcard Sets that can be created."
-          content:
-            application/json:
-              schema:
-                properties:
-                  limit:
+                  totalRequests:
                     type: "number"
-                    example: 5
+                    example: 4
         "404":
-          description: "Remaining Limit not found"
+          description: "Limit/totalRequests not found"
+
   /set/{setID}/comment:
     parameters:
       - name: setID

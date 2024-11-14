@@ -4,21 +4,26 @@ import { useFlashcardCommentSetData } from '@/components/context/FlashcardCommen
 import React, { useState, useEffect } from 'react';
 import Pagination from '@/components/Pagination';
 import { useSession } from '@/components/context/SessionContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 const FlashcardPage = () => {
-  const flashcardSet = useFlashcardCommentSetData();
+  const { flashcardCommentSet, loadFlashcardCommentSet } = useFlashcardCommentSetData();
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [canComment, setCanComment] = useState(false);
-  const [comments, setComments] = useState(flashcardSet?.comments || []);
+  const [comments, setComments] = useState(flashcardCommentSet?.comments || []);
   const [errorMessage, setErrorMessage] = useState('');
   const [submitComment, setSubmitComment] = useState(false);
 
-  const session = useSession();
+  const { session, refreshSession } = useSession() || {};
   const router = useRouter();
+  const params = useParams();
+
+  useEffect(() => {
+    loadFlashcardCommentSet(String(params.id))
+  }, [session, loadFlashcardCommentSet]);
 
   useEffect(() => {
     setCanComment(!!session);
@@ -28,8 +33,8 @@ const FlashcardPage = () => {
     if (submitComment) {
       const postComment = async () => {
         try {
-          console.log(session?.user.id != flashcardSet?.user_id)
-          if (!canComment && session?.user.id != flashcardSet?.user_id) {
+          console.log(session?.user.id != flashcardCommentSet?.user_id)
+          if (!canComment && session?.user.id != flashcardCommentSet?.user_id) {
             setErrorMessage('Please sign in to send Comment')
             return
           }
@@ -37,11 +42,11 @@ const FlashcardPage = () => {
             setErrorMessage('Please sign in to send Comment')
             return
           }
-          if (!flashcardSet) {
+          if (!flashcardCommentSet) {
             setErrorMessage('Failed to retrieve Flashcard Set information! Refresh page and try again.')
             return
           }
-          const response = await fetch(`http://localhost:3333/api/set/${flashcardSet.id}/comment`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/set/${flashcardCommentSet.id}/comment`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -76,13 +81,12 @@ const FlashcardPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitComment, newComment, session]);
 
-  if (!flashcardSet) {
-    router.back()
-    return
+  if (!flashcardCommentSet) {
+    return <p>Data currently not loaded. Try again in a minute</p>
   }
 
   const handleEditRedirect = () => {
-    router.push(`/flashcards/${flashcardSet.id}/edit`)
+    router.push(`/flashcards/${flashcardCommentSet.id}/edit`)
   }
 
   const handleAddComment = () => {
@@ -99,11 +103,11 @@ const FlashcardPage = () => {
     }
   };
 
-  const currentCard = flashcardSet.cards[currentCardIndex];
+  const currentCard = flashcardCommentSet.cards[currentCardIndex];
 
   return (
     <div className="flex flex-col h-full w-full overflow-y-auto items-center">
-      <h1 className="text-4xl font-bold translate-y-10">Flashcard Set - {flashcardSet.name}</h1>
+      <h1 className="text-4xl font-bold translate-y-10">Flashcard Set - {flashcardCommentSet.name}</h1>
 
       <div className="flex pt-14 w-full max-w-7xl space-x-5">
         <div className="flex flex-col justify-center items-center w-full p-10 rounded-3xl shadow-md max-h-[600px]">
@@ -122,18 +126,19 @@ const FlashcardPage = () => {
 
           <Pagination
             currentPage={currentCardIndex + 1}
-            totalPages={flashcardSet.cards.length}
+            totalPages={flashcardCommentSet.cards.length}
             onPageChange={ async (page) => {
               setShowAnswer(false);
               setCurrentCardIndex(page - 1);
             }}
           />
-          <button
+          {flashcardCommentSet.user_id === session?.user.id ? <button
             className="text-blue-500 font-semibold mt-4"
             onClick={handleEditRedirect}
           >
             Edit Flashcard Set
-          </button>
+          </button> : <></>}
+          
         </div>
       </div>
 
@@ -165,7 +170,7 @@ const FlashcardPage = () => {
               <p className="text-gray-500">No comments available.</p>
             )}
 
-            {canComment && session?.user.id !== flashcardSet?.user_id ? (
+            {canComment && session?.user.id !== flashcardCommentSet?.user_id ? (
               <div className="mt-4">
                 <textarea
                   className="w-full p-3 border rounded-lg text-black resize-none"
@@ -182,7 +187,7 @@ const FlashcardPage = () => {
                   Submit Comment
                 </button>
               </div>
-            ) : (session?.user.id === flashcardSet?.user_id ? <p></p> : <p className="text-black font-bold text-xl">Login to comment</p>)}
+            ) : (session?.user.id === flashcardCommentSet?.user_id ? <p></p> : <p className="text-black font-bold text-xl">Login to comment</p>)}
           </div>
         )}
       </div>

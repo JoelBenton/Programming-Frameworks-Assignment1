@@ -26,6 +26,27 @@ test.group('User Create', (group) => {
     assert.equal(users[0].username, user.username)
     assert.equal(response.response.statusCode, 201)
   })
+  test('Create a admin user', async ({ assert, client }) => {
+    const authUser = await UserFactory.merge({ admin: true }).create()
+    const user = await UserFactory.merge({ admin: true }).make()
+
+    const response = await client
+      .post('/api/users')
+      .json({
+        username: user.username,
+        admin: user.admin,
+        password: user.password,
+      })
+      .loginAs(authUser)
+
+    await authUser.delete()
+
+    const users = await User.all()
+
+    assert.equal(users.length, 1)
+    assert.equal(users[0].username, user.username)
+    assert.equal(response.response.statusCode, 201)
+  })
 
   test('Unauthorised Admin User Creation', async ({ assert, client }) => {
     const authUser = await UserFactory.merge({ admin: false }).create()

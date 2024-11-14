@@ -1,21 +1,41 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useFlashcardSetsData } from '@/components/context/FlashcardSetsContext'
 import Carousel from '@/components/Carousel'
 import type { FlashcardSet } from '@/lib/definitions'
 import { useRouter } from 'next/navigation'
+import { useSession } from '@/components/context/SessionContext'
 
 const Page = () => {
-  const flashcardSets = useFlashcardSetsData()
+  const flashcardUsersSetsContext = useFlashcardSetsData()
+  const sessionContext = useSession()
   const router = useRouter()
+
+  const session = sessionContext.session
+  const userId = session?.user.id
+
+  useEffect(() => {
+    flashcardUsersSetsContext.loadFlashcards('user', String(userId) || '')
+  }, [session, flashcardUsersSetsContext.loadFlashcards])
+
+  const flashcardSets = flashcardUsersSetsContext.flashcardSets || []
+
+  if (!session) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-gray-700 bg-gray-100 p-4 rounded-xl shadow-xl">
+          Please <span className="font-bold text-blue-600" onClick={() => router.push('/login')}>Login</span> to see the Library
+        </p>
+      </div>
+    );
+  }
 
   if (!flashcardSets) {
     return <></>
   }
 
   const handleItemClick = (set: FlashcardSet ) => {
-    console.log('Clicked Flashcard Set ID:', set.id)
     router.push(`/flashcards/${set.id}`)
   }
 

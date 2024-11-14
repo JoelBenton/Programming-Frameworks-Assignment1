@@ -5,10 +5,12 @@ import React, { useState } from 'react';
 import { login } from "@/lib/auth"; // Ensure these paths are correct
 import { authInput } from "@/validators/auth"; // Ensure this path is correct
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { useUsers } from '@/components/context/UsersContext';
+import { redirect } from 'next/navigation';
 
 const Page = () => {
+  const userContext = useUsers();
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({ username: [], password: [], general: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +38,8 @@ const Page = () => {
 
       if (result.success) {
         alert('Login Successful')
-        redirect('/')
+        userContext.refreshUsers()
+        window.location.href = '/'
       } else {
         setErrors((prev) => ({ ...prev, general: result.error || ""}));
       }

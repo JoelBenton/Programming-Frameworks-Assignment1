@@ -2,7 +2,7 @@ import { limitValidator } from '#validators/limit'
 import type { HttpContext } from '@adonisjs/core/http'
 import Redis from '@adonisjs/redis/services/main'
 
-const totalRequestsKey = 'global:total_requests'
+const totalRequestsKey = 'global_total_requests'
 const limitKey = 'global_daily_limit'
 
 export default class LimitsController {
@@ -35,18 +35,13 @@ export default class LimitsController {
   }
 
   // Retrieve the current limit
-  public async getLimit({ response }: HttpContext) {
+  public async getLimitInfo({ response }: HttpContext) {
     const limit = (await Redis.get('global_daily_limit')) || 20
-    return response.ok({ limit })
-  }
-
-  // Retrieve remaining requests
-  public async getRemainingRequests({ response }: HttpContext) {
     const totalRequests = Number(await Redis.get(totalRequestsKey))
-    const limit = Number(await Redis.get(limitKey))
 
-    const remainingRequests = limit - totalRequests
-
-    return response.ok({ remainingRequests: remainingRequests })
+    return response.ok({
+      limit: limit,
+      totalRequests: totalRequests,
+    })
   }
 }

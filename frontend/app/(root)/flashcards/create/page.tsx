@@ -6,9 +6,22 @@ import { Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import type { FlashcardSet } from '@/lib/definitions'
+import { useFlashcardSetsData } from '@/components/context/FlashcardSetsContext'
+import { sleep } from '@/lib/utils'
 
 const Page = () => {
-  const session = useSession()
+  const { session, refreshSession } = useSession() || {};
+  const { loadFlashcards } = useFlashcardSetsData() || {}
+
+  if (!session) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-gray-700 bg-gray-100 p-4 rounded-xl shadow-xl">
+          Please <span className="font-bold text-blue-600" onClick={() => router.push('/login')}>Login</span> to create Flashcards
+        </p>
+      </div>
+    );
+  }
 
   const [title, setTitle] = useState("")
   const [cards, setCards] = useState(
@@ -85,7 +98,7 @@ const Page = () => {
       if (!loading || !validatedData) return;
 
       try {
-        const response = await fetch('http://localhost:3333/api/sets', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/sets`, {
           method: 'POST',
           headers: { 
             'content-type': 'application/json',
@@ -95,8 +108,8 @@ const Page = () => {
         });
 
         if (response.ok) {
-          const data = await response.json()
-          router.push(`/flashcards/${data.data.id}`)
+          await sleep(400)
+          router.push(`/`)
         } else if (response.status === 403) {
           setError('User not authorised to make Flashcard Sets! Please login first.')
         } else if (response.status === 429) {
@@ -111,6 +124,7 @@ const Page = () => {
     }
 
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, validatedData]);
 
   return (

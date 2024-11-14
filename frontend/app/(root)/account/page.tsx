@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useSession } from '@/components/context/SessionContext'
 import { useRouter } from 'next/navigation'
@@ -6,7 +7,8 @@ import { usernameInput, passwordInput } from '@/validators/auth'
 import { login } from '@/lib/auth'
 
 const Page = () => {
-  const session = useSession()
+  const { session, refreshSession } = useSession() || {};
+  refreshSession();
   const route = useRouter()
 
   const [newUsername, setNewUsername] = useState('')
@@ -88,7 +90,7 @@ const Page = () => {
   
     // Send the request
     try {
-      const response = await fetch(`http://localhost:3333/api/users/${session.user.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/${session.user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +112,7 @@ const Page = () => {
         setError(result.error ?? 'Your information has been updated! However re-login has failed. Try login again with new information.');
       }
       
-    } catch (err) {
+    } catch {
       setError('An error occurred while updating your details.')
     }
   }

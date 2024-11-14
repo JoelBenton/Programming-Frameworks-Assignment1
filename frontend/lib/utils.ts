@@ -16,3 +16,7 @@ export function formatDate(date: string) {
 export function parseServerActionResponse<T>(response: T) {
   return JSON.parse(JSON.stringify(response))
 }
+
+export async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -20,15 +20,14 @@ function timeUntilMidnight() {
 }
 
 export const throttle = limiter.define('api', async () => {
-  const totalRequestsKey = 'global:total_requests'
+  const totalRequestsKey = 'global_total_requests'
   const limitKey = 'global_daily_limit'
 
   // Fetch the current total requests count from Redis
-  let totalRequests = Number(await Redis.get(totalRequestsKey))
+  let totalRequests = await Redis.get(totalRequestsKey)
 
   if (!totalRequests) {
-    totalRequests = 0
-    await Redis.set(totalRequestsKey, String(totalRequests))
+    await Redis.set(totalRequestsKey, 0)
     await Redis.expire(totalRequestsKey, timeUntilMidnight()) // Set to expire at midnight
   }
 

@@ -1,41 +1,49 @@
-import { cookies } from "next/headers";
+'use client'
 import { encrypt, decrypt } from "@/lib/auth";
-import type { CurrentUser } from '@/lib/definitions'
+import type { CurrentUser } from "@/lib/definitions";
+
+// Helper function to get a specific cookie
+const getCookie = (name: string): string | undefined => {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? match[2] : undefined;
+};
+
+// Helper function to set a cookie
+const setCookie = (name: string, value: string, expires: Date) => {
+  console.log(`${name}=${value}; expires=${expires.toUTCString()}; path=/;`)
+  document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/;`;
+};
+
+// Helper function to delete a cookie
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
 
 export async function createSession(user: CurrentUser) {
-  // Create the session
-  const expires = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000))
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
   const session = await encrypt({ user, expires });
 
-  // Save the session in a cookie
-  (await
-    // Save the session in a cookie
-    cookies()).set("session", session, { expires, httpOnly: true });
+  setCookie("session", session, expires);  // Set the session cookie
 }
 
 export async function getSession() {
-  const session = (await cookies()).get("session")?.value;
+  const session = getCookie("session");
   if (!session) return null;
-  return await decrypt(session);
+  
+  return await decrypt(session);  // Decrypt the session data
 }
 
 export async function updateSession() {
-  const session = (await cookies()).get('session')?.value
-  const payload = await decrypt(session)
+  const session = getCookie("session");
+  if (!session) return null;
 
-  if (!session || !payload) {
-    return null
-  }
+  const payload = await decrypt(session);
+  if (!payload) return null;
 
-  const expires = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000))
-
-  const cookieStore = await cookies()
-  cookieStore.set('session', session, {
-    httpOnly: true,
-    expires: expires
-  })
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);  // Update expiration date
+  setCookie("session", session, expires);  // Update session cookie with new expiration
 }
 
 export async function deleteSession() {
-  (await cookies()).delete('session');
+  deleteCookie("session");  // Remove session cookie
 }
