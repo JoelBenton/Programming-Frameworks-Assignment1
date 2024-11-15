@@ -4,27 +4,27 @@ import FlashcardSet from '#models/flashcard_set'
 import { DateTime } from 'luxon'
 
 export default class Flashcard extends BaseModel {
-  @column({ isPrimary: true })
-  declare id: number
+    @column({ isPrimary: true })
+    declare id: number
 
-  @column()
-  declare question: string
+    @column()
+    declare question: string
 
-  @column()
-  declare answer: string
+    @column()
+    declare answer: string
 
-  @column()
-  declare difficulty: string
+    @column()
+    declare difficulty: string
 
-  @column()
-  declare flashcardSetId: number
+    @column()
+    declare flashcardSetId: number
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+    @column.dateTime({ autoCreate: true })
+    declare createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    declare updatedAt: DateTime
 
-  @belongsTo(() => FlashcardSet)
-  declare flashcardSet: BelongsTo<typeof FlashcardSet>
+    @belongsTo(() => FlashcardSet)
+    declare flashcardSet: BelongsTo<typeof FlashcardSet>
 }

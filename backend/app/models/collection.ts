@@ -5,24 +5,24 @@ import { DateTime } from 'luxon'
 import CollectionSet from '#models/collection_set'
 
 export default class Collection extends BaseModel {
-  @column({ isPrimary: true })
-  declare id: number
+    @column({ isPrimary: true })
+    declare id: number
 
-  @column()
-  declare name: string
+    @column()
+    declare name: string
 
-  @column()
-  declare userId: number
+    @column()
+    declare userId: number
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+    @column.dateTime({ autoCreate: true })
+    declare createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    declare updatedAt: DateTime
 
-  @hasMany(() => CollectionSet)
-  declare sets: HasMany<typeof CollectionSet>
+    @hasMany(() => CollectionSet)
+    declare sets: HasMany<typeof CollectionSet>
 
-  @belongsTo(() => User)
-  declare user: BelongsTo<typeof User>
+    @belongsTo(() => User)
+    declare user: BelongsTo<typeof User>
 }

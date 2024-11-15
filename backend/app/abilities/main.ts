@@ -19,5 +19,5 @@ import { Bouncer } from '@adonisjs/bouncer'
  * scratch
  */
 export const editUser = Bouncer.ability(() => {
-  return true
+    return true
 })

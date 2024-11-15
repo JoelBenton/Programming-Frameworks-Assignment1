@@ -14,34 +14,34 @@ import limiter from '@adonisjs/limiter/services/main'
 
 // Utility to calculate time remaining until midnight (in seconds)
 function timeUntilMidnight() {
-  const now = new Date()
-  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
-  return Math.floor((midnight.getTime() - now.getTime()) / 1000) // Convert milliseconds to seconds
+    const now = new Date()
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    return Math.floor((midnight.getTime() - now.getTime()) / 1000) // Convert milliseconds to seconds
 }
 
 export const throttle = limiter.define('api', async () => {
-  const totalRequestsKey = 'global_total_requests'
-  const limitKey = 'global_daily_limit'
+    const totalRequestsKey = 'global_total_requests'
+    const limitKey = 'global_daily_limit'
 
-  // Fetch the current total requests count from Redis
-  let totalRequests = await Redis.get(totalRequestsKey)
+    // Fetch the current total requests count from Redis
+    let totalRequests = await Redis.get(totalRequestsKey)
 
-  if (!totalRequests) {
-    await Redis.set(totalRequestsKey, 0)
-    await Redis.expire(totalRequestsKey, timeUntilMidnight()) // Set to expire at midnight
-  }
+    if (!totalRequests) {
+        await Redis.set(totalRequestsKey, 0)
+        await Redis.expire(totalRequestsKey, timeUntilMidnight()) // Set to expire at midnight
+    }
 
-  // Fetch the maximum requests per day from Redis
-  const MAX_REQUESTS_PER_DAY = Number(await Redis.get(limitKey))
-  if (!MAX_REQUESTS_PER_DAY) {
-    Redis.set(limitKey, 20)
-  }
+    // Fetch the maximum requests per day from Redis
+    const MAX_REQUESTS_PER_DAY = Number(await Redis.get(limitKey))
+    if (!MAX_REQUESTS_PER_DAY) {
+        Redis.set(limitKey, 20)
+    }
 
-  // Check if the total requests are below the limit
-  if (Number(totalRequests) > Number(MAX_REQUESTS_PER_DAY)) {
-    throw new Error('Rate limit exceeded. Try again tomorrow.')
-  }
+    // Check if the total requests are below the limit
+    if (Number(totalRequests) > Number(MAX_REQUESTS_PER_DAY)) {
+        throw new Error('Rate limit exceeded. Try again tomorrow.')
+    }
 
-  // Allow requests for the current middleware
-  return limiter.allowRequests(1).every(1)
+    // Allow requests for the current middleware
+    return limiter.allowRequests(1).every(1)
 })

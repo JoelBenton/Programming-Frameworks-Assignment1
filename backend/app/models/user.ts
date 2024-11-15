@@ -10,36 +10,36 @@ import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
-  uids: ['username'],
-  passwordColumnName: 'password',
+    uids: ['username'],
+    passwordColumnName: 'password',
 })
 
 export default class User extends compose(BaseModel, AuthFinder) {
-  @column({ isPrimary: true })
-  declare id: number
+    @column({ isPrimary: true })
+    declare id: number
 
-  @column()
-  declare username: string
+    @column()
+    declare username: string
 
-  @column({ serializeAs: null })
-  declare password: string
+    @column({ serializeAs: null })
+    declare password: string
 
-  @column({
-    consume: (value: number) => !!value,
-  })
-  declare admin: boolean
+    @column({
+        consume: (value: number) => !!value,
+    })
+    declare admin: boolean
 
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+    @column.dateTime({ autoCreate: true })
+    declare createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+    @column.dateTime({ autoCreate: true, autoUpdate: true })
+    declare updatedAt: DateTime
 
-  @hasMany(() => FlashcardSet)
-  declare flashcardSets: HasMany<typeof FlashcardSet>
+    @hasMany(() => FlashcardSet)
+    declare flashcardSets: HasMany<typeof FlashcardSet>
 
-  @hasMany(() => Comment)
-  declare comments: HasMany<typeof Comment>
+    @hasMany(() => Comment)
+    declare comments: HasMany<typeof Comment>
 
-  static accessTokens = DbAccessTokensProvider.forModel(User)
+    static accessTokens = DbAccessTokensProvider.forModel(User)
 }

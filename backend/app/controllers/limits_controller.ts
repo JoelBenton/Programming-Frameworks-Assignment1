@@ -6,42 +6,42 @@ const totalRequestsKey = 'global_total_requests'
 const limitKey = 'global_daily_limit'
 
 export default class LimitsController {
-  // Update the daily creation limit
-  public async updateLimit({ request, response }: HttpContext) {
-    try {
-      const data = request.all()
+    // Update the daily creation limit
+    public async updateLimit({ request, response }: HttpContext) {
+        try {
+            const data = request.all()
 
-      const payload = await limitValidator.validate(data)
+            const payload = await limitValidator.validate(data)
 
-      const newLimit = payload.limit
+            const newLimit = payload.limit
 
-      // Set new limit
-      await Redis.set(limitKey, newLimit)
+            // Set new limit
+            await Redis.set(limitKey, newLimit)
 
-      return response.ok({ message: 'Daily limit updated', newLimit })
-    } catch (error) {
-      if (error.code === 'E_VALIDATION_ERROR') {
-        return response.badRequest({
-          message: 'Data Validation failed / The limit could not be updated',
-          error: error.message,
-        })
-      } else {
-        return response.internalServerError({
-          message: 'An error occurred while updating the limit',
-          error: error.message,
-        })
-      }
+            return response.ok({ message: 'Daily limit updated', newLimit })
+        } catch (error) {
+            if (error.code === 'E_VALIDATION_ERROR') {
+                return response.badRequest({
+                    message: 'Data Validation failed / The limit could not be updated',
+                    error: error.message,
+                })
+            } else {
+                return response.internalServerError({
+                    message: 'An error occurred while updating the limit',
+                    error: error.message,
+                })
+            }
+        }
     }
-  }
 
-  // Retrieve the current limit
-  public async getLimitInfo({ response }: HttpContext) {
-    const limit = (await Redis.get('global_daily_limit')) || 20
-    const totalRequests = Number(await Redis.get(totalRequestsKey))
+    // Retrieve the current limit
+    public async getLimitInfo({ response }: HttpContext) {
+        const limit = (await Redis.get('global_daily_limit')) || 20
+        const totalRequests = Number(await Redis.get(totalRequestsKey))
 
-    return response.ok({
-      limit: limit,
-      totalRequests: totalRequests,
-    })
-  }
+        return response.ok({
+            limit: limit,
+            totalRequests: totalRequests,
+        })
+    }
 }

@@ -15,10 +15,10 @@ import { authApiClient } from '@adonisjs/auth/plugins/api_client'
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
 export const plugins: Config['plugins'] = [
-  assert(),
-  apiClient(),
-  authApiClient(app),
-  pluginAdonisJS(app),
+    assert(),
+    apiClient(),
+    authApiClient(app),
+    pluginAdonisJS(app),
 ]
 
 /**
@@ -29,8 +29,8 @@ export const plugins: Config['plugins'] = [
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [() => testUtils.db('sqlite_testing').migrate()],
-  teardown: [],
+    setup: [() => testUtils.db('sqlite_testing').migrate()],
+    teardown: [],
 }
 
 /**
@@ -38,11 +38,11 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  * Learn more - https://japa.dev/docs/test-suites#lifecycle-hooks
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
-  if (['browser', 'functional', 'e2e'].includes(suite.name)) {
-    return suite.setup(() => testUtils.httpServer().start())
-  }
+    if (['browser', 'functional', 'e2e'].includes(suite.name)) {
+        return suite.setup(() => testUtils.httpServer().start())
+    }
 }
 
 export const reporters: Config['reporters'] = {
-  activated: ['spec'],
+    activated: ['spec'],
 }

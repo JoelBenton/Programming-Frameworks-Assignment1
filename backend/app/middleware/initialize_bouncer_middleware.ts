@@ -10,27 +10,27 @@ import type { NextFn } from '@adonisjs/core/types/http'
  * during an HTTP request
  */
 export default class InitializeBouncerMiddleware {
-  async handle(ctx: HttpContext, next: NextFn) {
-    /**
-     * Create bouncer instance for the ongoing HTTP request.
-     * We will pull the user from the HTTP context.
-     */
-    ctx.bouncer = new Bouncer(
-      () => ctx.auth.user || null,
-      abilities,
-      policies
-    ).setContainerResolver(ctx.containerResolver)
+    async handle(ctx: HttpContext, next: NextFn) {
+        /**
+         * Create bouncer instance for the ongoing HTTP request.
+         * We will pull the user from the HTTP context.
+         */
+        ctx.bouncer = new Bouncer(
+            () => ctx.auth.user || null,
+            abilities,
+            policies
+        ).setContainerResolver(ctx.containerResolver)
 
-    return next()
-  }
+        return next()
+    }
 }
 
 declare module '@adonisjs/core/http' {
-  export interface HttpContext {
-    bouncer: Bouncer<
-      Exclude<HttpContext['auth']['user'], undefined>,
-      typeof abilities,
-      typeof policies
-    >
-  }
+    export interface HttpContext {
+        bouncer: Bouncer<
+            Exclude<HttpContext['auth']['user'], undefined>,
+            typeof abilities,
+            typeof policies
+        >
+    }
 }
