@@ -19,6 +19,7 @@ test.group('User update', (group) => {
 
         assert.equal(response.response.statusCode, 200)
         assert.equal(ResponseData.username, 'NewUsername')
+        assert.equal(ResponseData.id, user.id)
     })
     test('Admin update user', async ({ assert, client }) => {
         const adminUser = await UserFactory.merge({ admin: true }).create()
@@ -67,7 +68,7 @@ test.group('User update', (group) => {
             })
             .loginAs(user)
 
-        assert.equal(response.response.statusCode, 403)
+        assert.equal(response.response.statusCode, 401)
     })
     test('Data Validation Error', async ({ assert, client }) => {
         const user = await UserFactory.merge({ admin: false }).create()

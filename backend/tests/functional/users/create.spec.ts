@@ -21,10 +21,18 @@ test.group('User Create', (group) => {
         await authUser.delete()
 
         const users = await User.all()
+        const responseBody = response.body()
 
         assert.equal(users.length, 1)
-        assert.equal(users[0].username, user.username)
         assert.equal(response.response.statusCode, 201)
+
+        // Validate response data
+        assert.equal(responseBody.message, 'User Created')
+        assert.deepEqual(responseBody.data, {
+            id: users[0].id,
+            username: users[0].username,
+            admin: users[0].admin,
+        })
     })
     test('Create a admin user', async ({ assert, client }) => {
         const authUser = await UserFactory.merge({ admin: true }).create()
@@ -41,11 +49,19 @@ test.group('User Create', (group) => {
 
         await authUser.delete()
 
+        const responseBody = response.body()
         const users = await User.all()
 
         assert.equal(users.length, 1)
-        assert.equal(users[0].username, user.username)
         assert.equal(response.response.statusCode, 201)
+
+        // Validate response data
+        assert.equal(responseBody.message, 'User Created')
+        assert.deepEqual(responseBody.data, {
+            id: users[0].id,
+            username: users[0].username,
+            admin: users[0].admin,
+        })
     })
 
     test('Unauthorised Admin User Creation', async ({ assert, client }) => {
@@ -62,6 +78,7 @@ test.group('User Create', (group) => {
             .loginAs(authUser)
 
         assert.equal(response.response.statusCode, 403)
+        assert.equal(response.response.body.message, 'Unauthorized access')
     })
 
     test('User Creation Failed', async ({ assert, client }) => {
@@ -78,5 +95,6 @@ test.group('User Create', (group) => {
             .loginAs(authUser)
 
         assert.equal(response.response.statusCode, 400)
+        assert.typeOf(response.response.body.message, 'string')
     })
 })

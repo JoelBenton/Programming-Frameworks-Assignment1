@@ -31,7 +31,6 @@ router
         })
         router.post('/users/register', [AuthController, 'register'])
         router.post('/users/login', [AuthController, 'login'])
-        router.post('/users/logout', [AuthController, 'logout']).use(middleware.auth())
 
         router.get('/users/:user_id/sets', [SetsController, 'userIndex'])
         router.get('/collections/random', [CollectionsController, 'indexRandom'])

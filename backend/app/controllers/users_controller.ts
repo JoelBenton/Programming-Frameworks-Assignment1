@@ -49,7 +49,7 @@ export default class UsersController {
             const payload = await usersValidator.validate(data)
 
             if (!(await bouncer.allows(isAdmin)) && Boolean(payload.admin) === true) {
-                return response.forbidden({ message: 'User not Authenticated for this action!' })
+                return response.forbidden({ message: 'Unauthorized access' })
             }
 
             // Create the user in the database
@@ -115,7 +115,7 @@ export default class UsersController {
             const authUser = auth.getUserOrFail()
 
             if (authUser.id !== id && !authUser.admin) {
-                return response.forbidden({ message: 'User not Authenticated for this action!' })
+                return response.unauthorized({ message: 'User not Authenticated for this action!' })
             }
 
             const data = request.all()
@@ -135,7 +135,7 @@ export default class UsersController {
                     console.log('Updating Users admin permission : ' + payload.admin)
                     user.admin = payload.admin
                 } else {
-                    return response.forbidden({
+                    return response.unauthorized({
                         message: 'User not Authenticated for this action!',
                     })
                 }
@@ -185,9 +185,7 @@ export default class UsersController {
         try {
             const user = await User.findOrFail(id)
             await user.delete()
-            return response.created({
-                message: 'User Deleted',
-            })
+            return response.noContent()
         } catch (error) {
             if (error.code === 'E_ROW_NOT_FOUND') {
                 return response.forbidden({

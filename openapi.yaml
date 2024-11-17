@@ -26,7 +26,7 @@ paths:
                     type: "string"
                     example: "1.0.0"
                 
-  /login:
+  /users/login:
     post:
       summary: "Login"
       tags:
@@ -67,7 +67,7 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/Error"
-  /register:
+  /users/register:
     post:
       summary: "Register"
       tags:
@@ -110,32 +110,6 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/Error"
-  /logout:
-    post:
-      summary: "Logout"
-      tags:
-        - "General"
-      responses:
-        "200":
-          description: "Successfully Logged Out"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  message:
-                    type: string
-                    example: "Logged Out"
-        "401":
-          description: "Unauthorised"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  message:
-                    type: string
-                    example: "Unauthorized access"
   /sets:
     get:
       summary: "Get all flashcard sets"
@@ -559,7 +533,7 @@ paths:
       responses:
         "204":
           description: "The user was deleted"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:

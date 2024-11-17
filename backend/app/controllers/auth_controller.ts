@@ -44,23 +44,4 @@ export default class AuthController {
             return response.internalServerError({ message: 'Login failed', error: error.message })
         }
     }
-
-    async logout({ auth, response }: HttpContext) {
-        try {
-            const user = await auth.getUserOrFail()
-            const token = auth.user?.currentAccessToken.identifier
-
-            if (!token) {
-                return response.unauthorized({ message: 'User not logged in' })
-            }
-
-            await User.accessTokens.delete(user, token)
-            return response.ok({ message: 'Logged out' })
-        } catch (error) {
-            if (error.code === 'E_UNAUTHORIZED_ACCESS') {
-                return response.unauthorized({ message: 'User not logged in' })
-            }
-            return response.internalServerError({ message: 'Logout failed', error: error.message })
-        }
-    }
 }

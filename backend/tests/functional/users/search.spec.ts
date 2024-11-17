@@ -19,5 +19,6 @@ test.group('User Search', (group) => {
         const response = await client.get(`/api/users/1`)
 
         assert.equal(response.response.statusCode, 404)
+        assert.typeOf(response.response.body.message, 'string')
     })
 })
