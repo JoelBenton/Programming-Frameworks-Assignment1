@@ -1,17 +1,19 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Collection from '#models/collection'
-import { collectionsValidator } from '#validators/collection'
+import { collectionsCreateValidator } from '#validators/collection'
 import CollectionSet from '#models/collection_set'
 import { getRandomObject } from '../helper/utils_helper.js'
 
 function returnCollectionData(CollectionData: Collection) {
     const formattedData = {
+        id: CollectionData.id,
         name: CollectionData.name,
         sets: CollectionData.sets.map((set) => ({
             comment: set.comment,
             set: {
                 id: set.flashcardSetId,
                 name: set.flashcardSet.name,
+                user_id: set.flashcardSet.userId,
                 cards: set.flashcardSet.flashcards.map((card) => ({
                     id: card.id,
                     question: card.question,
@@ -75,7 +77,7 @@ export default class CollectionsController {
             const data = request.all()
 
             // Validate data.
-            const payload = await collectionsValidator.validate(data)
+            const payload = await collectionsCreateValidator.validate(data)
 
             const collection = await Collection.create({
                 name: payload.name,
@@ -103,7 +105,7 @@ export default class CollectionsController {
             })
         } catch (error) {
             console.log(error)
-            if (error.status() === 401) {
+            if (error.status === 401) {
                 return response.unauthorized({
                     message: 'Unauthorised User',
                     error: error.message,
@@ -138,7 +140,7 @@ export default class CollectionsController {
             const collection = getRandomObject(collections)
 
             response.ok({
-                url: `/users/${collection?.userId}/collections/${collection?.id}`,
+                url: `/collections/${collection?.id}`,
             })
         } catch (error) {
             if (error.code === 'E_ROW_NOT_FOUND') {

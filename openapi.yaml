@@ -705,20 +705,31 @@ paths:
             schema:
               type: "object"
               properties:
-                name:
-                  type: "string"
-                  example: "Geography Sets"
-                sets:
-                  type: "array"
-                  items:
-                    type: "object"
-                    properties:
-                      comment:
-                        type: "string"
-                        example: "I love this set!"
-                      setID:
-                        type: "number"
-                        example: 1
+                    id:
+                      type: number
+                      example: 1
+                    name:
+                      type: "string"
+                      example: "Geography Sets"
+                    sets:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          comment:
+                            type: "string"  
+                            description: "The user's comment on the set"
+                          set:
+                            $ref: "#/components/schemas/FlashcardSet"
+                    user:
+                      type: "object"
+                      properties:
+                        id:
+                          type: string
+                          example: "1"
+                        username:
+                          type: string
+                          example: "JohnDoe"
       responses:
         "200":
           description: "The updated flashcard set collection"
@@ -799,6 +810,9 @@ paths:
                 items:
                   type: "object"
                   properties:
+                    id:
+                      type: number
+                      example: 1
                     name:
                       type: "string"
                       example: "Geography Sets"

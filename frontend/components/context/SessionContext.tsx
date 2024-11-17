@@ -1,67 +1,64 @@
-"use client"; // Add this directive at the top of the file
+"use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { getSession, deleteSession } from "@/lib/session";
-import type { SessionPayload } from "@/lib/definitions";  // Assuming you have a SessionPayload type
+import type { SessionPayload } from "@/lib/definitions";
 
-// Creating the context with default values
 const SessionContext = createContext<{
-  session: SessionPayload | null;
-  refreshSession: () => void;
-  logout: () => void;
+    session: SessionPayload | null;
+    refreshSession: () => void;
+    logout: () => void;
 }>({
-  session: null,
-  refreshSession: () => {},
-  logout: () => {},
+    session: null,
+    refreshSession: () => {},
+    logout: () => {},
 });
 
 export const useSession = () => useContext(SessionContext);
 
-export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [session, setSession] = useState<SessionPayload | null>(null);
+export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
+    children,
+}) => {
+    const [session, setSession] = useState<SessionPayload | null>(null);
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const sessionData = await getSession();
-        if (sessionData) {
-          // If sessionData is valid, parse it; otherwise, set session to null
-          const parsedSession = sessionData ? JSON.parse(sessionData) : null;
-          setSession(parsedSession);
-        } else {
-          setSession(null); // If no session data, set session to null
+    useEffect(() => {
+        const fetchSession = async () => {
+            try {
+                const sessionData = await getSession();
+                setSession(sessionData ? JSON.parse(sessionData) : null);
+            } catch (error) {
+                console.error("Failed to load session:", error);
+                setSession(null);
+            }
+        };
+
+        fetchSession();
+    }, []);
+
+    // Memoize the refreshSession function
+    const refreshSession = useCallback(async () => {
+        try {
+            const updatedSession = await getSession();
+            setSession(updatedSession ? JSON.parse(updatedSession) : null);
+        } catch (error) {
+            console.error("Failed to refresh session:", error);
+            setSession(null);
         }
-      } catch (error) {
-        console.error("Failed to load session:", error);
-        setSession(null); // Handle parsing errors gracefully
-      }
-    };
+    }, []);
 
-    fetchSession();
-  }, []);
+    // Memoize the logout function
+    const logout = useCallback(async () => {
+        try {
+            await deleteSession();
+            setSession(null);
+        } catch (error) {
+            console.error("Failed to logout:", error);
+        }
+    }, []);
 
-  const refreshSession = async () => {
-    try {
-      const updatedSession = await getSession();
-      setSession(updatedSession ? JSON.parse(updatedSession) : null); // Ensure the session is valid
-    } catch (error) {
-      console.error("Failed to refresh session:", error);
-      setSession(null); // Handle errors gracefully
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await deleteSession();
-      setSession(null); // Clear session from state
-    } catch (error) {
-      console.error("Failed to logout:", error);
-    }
-  };
-
-  return (
-    <SessionContext.Provider value={{ session, refreshSession, logout }}>
-      {children}
-    </SessionContext.Provider>
-  );
+    return (
+        <SessionContext.Provider value={{ session, refreshSession, logout }}>
+            {children}
+        </SessionContext.Provider>
+    );
 };

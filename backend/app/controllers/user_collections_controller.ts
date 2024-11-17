@@ -1,6 +1,6 @@
 import Collection from '#models/collection'
 import CollectionSet from '#models/collection_set'
-import { userCollectionsValidator } from '#validators/user_collection'
+import { userCollectionsUpdateValidator } from '#validators/user_collection'
 import type { HttpContext } from '@adonisjs/core/http'
 
 function returnCollectionData(CollectionData: Collection) {
@@ -134,7 +134,7 @@ export default class UserCollectionsController {
             }
 
             const data = request.all()
-            const payload = await userCollectionsValidator.validate(data)
+            const payload = await userCollectionsUpdateValidator.validate(data)
 
             const collection = await Collection.query()
                 .where('userId', userId)
@@ -156,7 +156,7 @@ export default class UserCollectionsController {
 
             const updatedCollectionSets = payload.sets.map((set) => ({
                 comment: set.comment,
-                flashcardSetId: set.setId,
+                flashcardSetId: set.set.id,
                 collectionId: collectionId,
             }))
 

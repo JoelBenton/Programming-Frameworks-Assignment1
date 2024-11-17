@@ -1,100 +1,110 @@
-'use client'
+"use client";
 
 import { SignJWT, jwtVerify } from "jose";
 import { createSession, deleteSession, getSession } from "@/lib/session";
-import type { Credentials, SessionPayload, CurrentUser } from "@/lib/definitions";
+import type {
+    Credentials,
+    SessionPayload,
+    CurrentUser,
+} from "@/lib/definitions";
 
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload: SessionPayload) {
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("1 day from now")
-    .sign(key);
+    return new SignJWT(payload)
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setExpirationTime("1 day from now")
+        .sign(key);
 }
 
 export async function decrypt(session: string | undefined = "") {
-  try {
-    const { payload } = await jwtVerify(session, key, {
-      algorithms: ["HS256"],
-    });
-    return JSON.stringify(payload);
-  } catch {
-    return null;
-  }
-  
+    try {
+        const { payload } = await jwtVerify(session, key, {
+            algorithms: ["HS256"],
+        });
+        return JSON.stringify(payload);
+    } catch {
+        return null;
+    }
 }
 
 export async function register(credentials: Credentials) {
-  try {
-    const response = await fetch('${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/register', {
-      method: 'POST',
-      headers: { 
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(credentials)
-    });
+    try {
+        const response = await fetch(
+            "${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/register",
+            {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify(credentials),
+            },
+        );
 
-    console.log(await response.json())
+        console.log(await response.json());
 
-    if (response.ok) {
-
-      return { success: true }
+        if (response.ok) {
+            return { success: true };
+        } else if (response.status === 403) {
+            return { success: false, username: "User already exists" };
+        } else {
+            return { success: false, error: "An unknown error occurred" };
+        }
+    } catch (error) {
+        console.error(error);
+        return {
+            success: false,
+            error: "Network error. Please try again later.",
+        };
     }
-    else if (response.status === 403) {
-      return { success: false, username: 'User already exists' };
-    } else {
-      return { success: false, error: 'An unknown error occurred' };
-    }
-  } catch (error) {
-    console.error(error);
-    return { success: false, error: 'Network error. Please try again later.' };
-  }
-  
 }
 
 export async function login(credentials: Credentials) {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/login`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(credentials)
-    })
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/login`,
+            {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify(credentials),
+            },
+        );
 
-    if (response.ok) {
-      const data = await response.json()
+        if (response.ok) {
+            const data = await response.json();
 
-      // Verify credentials && get the user
-      const user: CurrentUser = {
-        id: data.id,
-        username: data.username,
-        admin: data.admin,
-        token: data.token.token,
-      }
+            // Verify credentials && get the user
+            const user: CurrentUser = {
+                id: data.id,
+                username: data.username,
+                admin: data.admin,
+                token: data.token.token,
+            };
 
-      createSession(user)
-      return { success: true, user}
+            createSession(user);
+            return { success: true, user };
+        } else if (response.status === 403 || response.status === 400) {
+            return { success: false, error: "Login Failed! Try again" };
+        } else {
+            return { success: false, error: "An unknown error occurred" };
+        }
+    } catch (error) {
+        console.error(error);
+        return {
+            success: false,
+            error: "Network error. Please try again later.",
+        };
     }
-    else if (response.status === 403 || response.status === 400) {
-      return { success: false, error: 'Login Failed! Try again' };
-    } else {
-      return { success: false, error: 'An unknown error occurred' };
-    }
-  } catch (error) {
-    console.error(error);
-    return { success: false, error: 'Network error. Please try again later.' };
-  }
 }
 export async function logout() {
-  deleteSession()
+    deleteSession();
 }
 
 export async function checkSession() {
-  const session = await getSession()
-  if (!session) {
-    return false
-    }
-    else return true
+    const session = await getSession();
+    if (!session) {
+        return false;
+    } else return true;
 }
