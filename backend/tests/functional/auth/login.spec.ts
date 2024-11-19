@@ -1,3 +1,4 @@
+import { CollectionFactory } from '#database/factories/collection_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import User from '#models/user'
 import testUtils from '@adonisjs/core/services/test_utils'
@@ -16,7 +17,10 @@ test.group('Auth login', (group) => {
             .post('/api/users/login')
             .json({ username: user.username, password: password })
 
+        const data = response.response.body
+
         assert.equal(response.response.statusCode, 200)
+        assert.isNotNull(data.token.token)
     })
 
     test('Validation Failed (Login details didnt meet validators requirements)', async ({

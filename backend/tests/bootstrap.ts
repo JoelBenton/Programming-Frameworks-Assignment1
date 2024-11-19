@@ -5,6 +5,7 @@ import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
+import Redis from '@adonisjs/redis/services/main'
 
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
@@ -29,7 +30,12 @@ export const plugins: Config['plugins'] = [
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-    setup: [() => testUtils.db('sqlite_testing').migrate()],
+    setup: [
+        async () => {
+            await Redis.connection('testing').flushall() // Clears Redis before tests continue
+            await testUtils.db('sqlite_testing').migrate() // Runs Migrations for tables.
+        },
+    ],
     teardown: [],
 }
 

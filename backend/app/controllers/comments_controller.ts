@@ -11,9 +11,6 @@ export default class CommentsController {
         try {
             const flashcardSetId = params.set_id
 
-            const payload = request.all()
-            const data = await commentValidator.validate(payload)
-
             // Check if the flashcard set exists
             const flashcardSet = await FlashcardSet.find(flashcardSetId)
             if (!flashcardSet) {
@@ -21,6 +18,8 @@ export default class CommentsController {
                     message: `Flashcard set with ID ${flashcardSetId} not found`,
                 })
             }
+            const payload = request.all()
+            const data = await commentValidator.validate(payload)
 
             const comment = await Comment.create({
                 userId: data.user_id,
@@ -36,6 +35,7 @@ export default class CommentsController {
                 set: {
                     id: comment.flashcardSet.id,
                     name: comment.flashcardSet.name,
+                    user_id: comment.flashcardSet.userId,
                     cards: comment.flashcardSet.flashcards.map((obj) => ({
                         id: obj.id,
                         question: obj.question,
@@ -52,16 +52,12 @@ export default class CommentsController {
                 },
             })
         } catch (error) {
-            console.error('Error creating comment:', error)
-
-            // Handle validation errors
             if (error.code === 'E_VALIDATION_ERROR') {
                 return response.badRequest({
-                    message: 'Validation failed',
-                    errors: error.message, // Assuming error contains messages
+                    message: 'Data Validation failed',
+                    errors: error.message,
                 })
             }
-
             // Handle any other errors
             return response.internalServerError({
                 message: 'An error occurred while creating the comment',

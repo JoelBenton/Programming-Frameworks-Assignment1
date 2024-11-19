@@ -3,11 +3,11 @@ import FlashcardSet from '#models/flashcard_set'
 import Comment from '#models/comment'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
-import { AccessToken } from '@adonisjs/auth/access_tokens'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
+import Collection from './collection.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
     uids: ['username'],
@@ -40,6 +40,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
     @hasMany(() => Comment)
     declare comments: HasMany<typeof Comment>
+
+    @hasMany(() => Collection)
+    declare collections: HasMany<typeof Collection>
 
     static accessTokens = DbAccessTokensProvider.forModel(User)
 }

@@ -6,10 +6,10 @@ export default class CardsController {
     /**
      * Display a list of resource
      */
-    async index({ params, response }: HttpContext) {
+    async index({ params, request, response }: HttpContext) {
         try {
             const flashcardSetId = params.set_id
-            const shuffle = params.shuffle === 'true'
+            const shuffle = request.qs().shuffle === 'true'
 
             const flashcardSetModel = await FlashcardSet.findOrFail(flashcardSetId)
 

@@ -16,7 +16,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ flashcard, user, onSubmit }) => {
         <div className="p-3 w-full">
             <Card className="bg-gradient-to-br from-[#c2e0d3] to-[#b3c7f9] rounded-xl shadow-xl p-4 transition-transform transform hover:scale-105 relative">
                 <CardContent className="flex flex-col items-center">
-                    <h2 className="text-xl font-semibold mb-2">
+                    <h2 className="text-xl font-semibold mb-2 text-gray-900">
                         {flashcard.name}
                     </h2>
                     <div className="bg-gray-500 rounded-full px-4 py-1 text-sm text-center font-medium">

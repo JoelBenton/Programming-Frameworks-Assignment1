@@ -8,6 +8,7 @@ import { useFlashcardSetsData } from "@/components/context/FlashcardSetsContext"
 import { useSession } from "@/components/context/SessionContext";
 import { sleep } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useCollectionsData } from "@/components/context/CollectionsContext";
 
 type collectionPayload = {
     name: string;
@@ -21,6 +22,7 @@ type collectionPayload = {
 const Page: React.FC = () => {
     const sessionContext = useSession();
     const session = sessionContext.session || null;
+    const collectionContext = useCollectionsData();
 
     const [title, setTitle] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -56,6 +58,7 @@ const Page: React.FC = () => {
                 );
 
                 if (response.ok) {
+                    collectionContext.refreshCollections()
                     await sleep(400);
                     router.push(`/`);
                 } else if (response.status === 403) {

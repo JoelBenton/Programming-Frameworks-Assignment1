@@ -129,7 +129,6 @@ export default class SetsController {
             await flashcardSet.load('flashcards')
 
             if (!admin) {
-                console.log('adding 1 to totalRequests')
                 Redis.set(totalRequestsKey, totalRequests + 1)
             }
 
@@ -185,8 +184,6 @@ export default class SetsController {
                 data: flashcardSetsWithComments,
             })
         } catch (error) {
-            console.log(error)
-
             if (error.code === 'E_ROW_NOT_FOUND') {
                 return response.notFound({
                     message: 'The Flashcard Set was not found',
@@ -205,14 +202,19 @@ export default class SetsController {
     /**
      * Handle form submission for the edit action
      */
-    async update({ params, request, response }: HttpContext) {
+    async update({ params, request, response, auth }: HttpContext) {
         const setId = params.id
 
         try {
-            const data = request.all()
-
-            const payload = await flashcardSetsValidator.validate(data)
+            const user = auth.getUserOrFail()
             const flashcardSet = await FlashcardSet.findOrFail(setId)
+
+            if (user.id !== flashcardSet.userId) {
+                return response.unauthorized({ message: 'Unauthorized access' })
+            }
+
+            const data = request.all()
+            const payload = await flashcardSetsValidator.validate(data)
 
             flashcardSet.name = payload.name
             await flashcardSet.save()
@@ -286,16 +288,22 @@ export default class SetsController {
     /**
      * Delete record
      */
-    async destroy({ params, response }: HttpContext) {
+    async destroy({ params, response, auth }: HttpContext) {
         const id = params.id
 
         try {
+            const user = auth.getUserOrFail()
             const flashcardSet = await FlashcardSet.findOrFail(id)
+
+            if (user.id !== flashcardSet.userId) {
+                return response.unauthorized({ message: 'Unauthorized access' })
+            }
+
             flashcardSet.delete()
             return response.noContent()
         } catch (error) {
             if (error.code === 'E_ROW_NOT_FOUND') {
-                return response.forbidden({
+                return response.notFound({
                     message: 'No flashcard Set with that ID.',
                     error: error.message,
                 })

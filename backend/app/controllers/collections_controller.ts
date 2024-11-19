@@ -95,30 +95,35 @@ export default class CollectionsController {
             await collection.load('sets')
             await collection.load('user')
 
-            return response.ok({
+            return response.created({
                 message: 'Flashcard set collection Created',
                 data: {
                     name: collection.name,
-                    sets: collection.sets,
-                    user: collection.user,
+                    sets: collection.sets.map((set) => ({
+                        comment: set.comment,
+                        setID: set.flashcardSetId,
+                    })),
+                    user: {
+                        id: collection.user.id,
+                        username: collection.user.username,
+                    },
                 },
             })
         } catch (error) {
-            console.log(error)
-            if (error.status === 401) {
+            if (error.code === 'E_ROW_NOT_FOUND') {
                 return response.unauthorized({
-                    message: 'Unauthorised User',
+                    message: 'Unauthorised',
                     error: error.message,
                 })
             }
-            if (error.code === 'E_ROW_NOT_FOUND') {
+            if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
                 return response.notFound({
-                    message: 'The Flashcard Set was not found',
+                    message: 'A Flashcard Set was not found',
                     error: error.message,
                 })
             }
             return response.internalServerError({
-                message: 'An error occurred while obtaining Flashcard Sets',
+                message: 'An error occurred while Creating Collection',
                 error: error.message,
             })
         }
@@ -138,6 +143,12 @@ export default class CollectionsController {
             }
 
             const collection = getRandomObject(collections)
+
+            if (!collection) {
+                return response.notFound({
+                    message: 'No Collections Found.',
+                })
+            }
 
             response.ok({
                 url: `/collections/${collection?.id}`,

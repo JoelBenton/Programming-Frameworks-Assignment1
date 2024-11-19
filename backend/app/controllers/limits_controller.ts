@@ -7,8 +7,13 @@ const limitKey = 'global_daily_limit'
 
 export default class LimitsController {
     // Update the daily creation limit
-    public async updateLimit({ request, response }: HttpContext) {
+    public async updateLimit({ request, response, auth }: HttpContext) {
         try {
+            const user = auth.getUserOrFail()
+
+            if (user.admin !== true) {
+                return response.unauthorized({ message: 'Unauthorized access' })
+            }
             const data = request.all()
 
             const payload = await limitValidator.validate(data)
@@ -36,8 +41,8 @@ export default class LimitsController {
 
     // Retrieve the current limit
     public async getLimitInfo({ response }: HttpContext) {
-        const limit = (await Redis.get('global_daily_limit')) || 20
-        const totalRequests = Number(await Redis.get(totalRequestsKey))
+        const limit = (await Redis.get('global_daily_limit')) || 0
+        const totalRequests = Number(await Redis.get(totalRequestsKey)) || 0
 
         return response.ok({
             limit: limit,

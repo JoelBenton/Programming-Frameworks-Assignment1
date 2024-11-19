@@ -134,7 +134,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FlashcardSet"
+              $ref: "#/components/schemas/FlashcardSetInput"
       responses:
         "201":
           description: "The created flashcard set"
@@ -142,7 +142,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:
@@ -207,7 +207,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FlashcardSet"
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                  example: "European Capitals"
+                user_id:
+                  type: "number"
+                  example: 1
+                cards:
+                  $ref: "#/components/schemas/FlashCard"
       responses:
         "200":
           description: "The updated flashcard set"
@@ -215,7 +224,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FlashcardSet"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:
@@ -238,7 +247,7 @@ paths:
       responses:
         "204":
           description: "The flashcard set was deleted"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:
@@ -270,18 +279,18 @@ paths:
       responses:
         "200":
           description: "Limit Updated"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:
               schema:
-                type: "object"
-                properties:
-                  message:
-                    type: string
-                    example: "Unauthorized access"
-        "404":
-          description: "Limit not found"
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: "Invalid Limit number"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /sets/get-limit-info:
     get:
       summary: "Get the current Limit of Flashcard Sets that can be created each day."
@@ -300,10 +309,8 @@ paths:
                   totalRequests:
                     type: "number"
                     example: 4
-        "404":
-          description: "Limit/totalRequests not found"
 
-  /set/{setID}/comment:
+  /sets/{setID}/comment:
     parameters:
       - name: setID
         in: path
@@ -335,7 +342,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Comment"
-        "403":
+        "400":
+          description: "Invalid Comment or User ID."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
           description: "Unauthorised"
           content:
             application/json:
@@ -592,6 +605,8 @@ paths:
                 items:
                   type: "object"
                   properties:
+                    id:
+                      type: "number"
                     name:
                       type: "string"
                       example: "Geography Sets"
@@ -712,6 +727,8 @@ paths:
               schema:
                 type: "object"
                 properties:
+                  id:
+                    type: "number"
                   name:
                     type: "string"
                     description: "The user's comment on the set"
@@ -758,7 +775,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
         "401":
-          description: "You are not authorized ('logged in') to delete this collection"
+          description: "You are not authorized to delete this collection"
           content:
             application/json:
               schema:
@@ -869,7 +886,7 @@ paths:
                       username:
                         type: "string"
                         example: "john_doe"
-        "403":
+        "401":
           description: "Unauthorised"
           content:
             application/json:
@@ -891,13 +908,16 @@ paths:
       tags:
         - "Collections"
       responses:
-        "302":
+        "200":
           description: "Redirect to a random flashcard set collection"
-          headers:
-            Location:
+          content:
+            application/json:
               schema:
-                type: "string"
-                example: "/users/1/collections/1"
+                type: "object"
+                properties:
+                  url:
+                    type: "string"
+                    example: "/collections/1"
         "404":
           description: "There are no flashcard set collections"
           content:
@@ -914,6 +934,18 @@ components:
         id:
           type: "number"
           example: 1
+        question:
+          type: "string"
+          example: "What is the capital of France?"
+        answer:
+          type: "string"
+          example: "Paris"
+        difficulty:
+          $ref: "#/components/schemas/Difficulty"
+          nullable: true
+    FlashCardWithoutIds:
+      type: "object"
+      properties:
         question:
           type: "string"
           example: "What is the capital of France?"
@@ -947,6 +979,16 @@ components:
           type: "string"
           format: "date-time"
           example: "2024-10-15T12:00:00Z"
+    FlashcardSetInput:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          example: "European Capitals"
+        cards:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/FlashCardWithoutIds"
     Error:
       type: "object"
       properties:

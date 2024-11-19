@@ -1,14 +1,15 @@
 import factory from '@adonisjs/lucid/factories'
 import User from '#models/user'
-import { DateTime } from 'luxon'
+import { FlashcardSetFactory } from './flashcard_set_factory.js'
+import { CollectionFactory } from './collection_factory.js'
 export const UserFactory = factory
     .define(User, async ({ faker }) => {
         return {
-            username: faker.internet.userName(),
+            username: faker.internet.displayName(),
             password: faker.internet.password(),
             admin: faker.datatype.boolean(),
-            created_at: DateTime.fromJSDate(faker.date.past()),
-            updated_at: DateTime.fromJSDate(faker.date.recent()),
         }
     })
+    .relation('flashcardSets', () => FlashcardSetFactory)
+    .relation('collections', () => CollectionFactory)
     .build()

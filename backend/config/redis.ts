@@ -3,8 +3,7 @@ import { defineConfig } from '@adonisjs/redis'
 import { InferConnections } from '@adonisjs/redis/types'
 
 const redisConfig = defineConfig({
-    connection: 'main',
-
+    connection: process.env.NODE_ENV === 'test' ? 'testing' : 'main',
     connections: {
         /*
     |--------------------------------------------------------------------------
@@ -22,6 +21,16 @@ const redisConfig = defineConfig({
             password: env.get('REDIS_PASSWORD', ''),
             db: 0,
             keyPrefix: '',
+            retryStrategy(times) {
+                return times > 10 ? null : times * 50
+            },
+        },
+        testing: {
+            host: env.get('REDIS_HOST'),
+            port: env.get('REDIS_PORT'),
+            password: env.get('REDIS_PASSWORD', ''),
+            db: 1,
+            keyPrefix: 'test:',
             retryStrategy(times) {
                 return times > 10 ? null : times * 50
             },

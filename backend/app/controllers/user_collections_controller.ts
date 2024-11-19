@@ -5,12 +5,14 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 function returnCollectionData(CollectionData: Collection) {
     const formattedData = {
+        id: CollectionData.id,
         name: CollectionData.name,
         sets: CollectionData.sets.map((set) => ({
             comment: set.comment,
             set: {
                 id: set.flashcardSetId,
                 name: set.flashcardSet.name,
+                user_id: set.flashcardSet.userId,
                 cards: set.flashcardSet.flashcards.map((card) => ({
                     id: card.id,
                     question: card.question,
@@ -132,9 +134,7 @@ export default class UserCollectionsController {
                     message: 'You are not allowed to delete this collection',
                 })
             }
-
             const data = request.all()
-            const payload = await userCollectionsUpdateValidator.validate(data)
 
             const collection = await Collection.query()
                 .where('userId', userId)
@@ -146,6 +146,8 @@ export default class UserCollectionsController {
                 })
                 .preload('user')
                 .firstOrFail()
+
+            const payload = await userCollectionsUpdateValidator.validate(data)
 
             collection.name = payload.name
             await collection.save()
@@ -168,14 +170,11 @@ export default class UserCollectionsController {
                 })
             })
 
-            console.log(JSON.stringify(collection))
-
             return response.ok({
                 message: 'Flashcard set updated successfully',
                 data: returnCollectionData(collection),
             })
         } catch (error) {
-            console.log(error)
             if (error.status === 401) {
                 return response.unauthorized({
                     message: 'You are not Authorised / Logged in.',
@@ -206,7 +205,7 @@ export default class UserCollectionsController {
             const user = auth.getUserOrFail()
 
             if (Number(userId) !== Number(user.id)) {
-                return response.unauthorized({
+                return response.forbidden({
                     message: 'You are not allowed to delete this collection',
                 })
             }
@@ -221,8 +220,6 @@ export default class UserCollectionsController {
                 })
                 .preload('user')
                 .firstOrFail()
-
-            console.log(collection)
 
             collection.delete()
 
