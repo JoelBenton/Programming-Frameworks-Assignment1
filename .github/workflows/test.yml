@@ -44,13 +44,6 @@ jobs:
         working-directory: ./backend
         run: cp .env.example .env
 
-      - name: Wait for Redis
-        run: |
-          until redis-cli ping; do
-            echo "Waiting for Redis..."
-            sleep 1
-          done
-
       - name: Generate APP_KEY
         working-directory: ./backend
         run: node ace generate:key
