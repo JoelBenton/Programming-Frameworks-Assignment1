@@ -14,10 +14,10 @@ import { fetchCollections } from "@/lib/api";
 const CollectionsContext = createContext<{
     collections: Collection[] | null;
     refreshCollections: () => Promise<void>;
-}>({
-    collections: null,
-    refreshCollections: async () => {},
-});
+        }>({
+            collections: null,
+            refreshCollections: async () => {},
+        });
 
 // Hook to use the CollectionsContext
 export const useCollectionsData = () => {

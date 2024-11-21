@@ -4,6 +4,7 @@ import User from '#models/user'
 import Comment from '#models/comment'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import CollectionSet from './collection_set.js'
 
 export default class FlashcardSet extends BaseModel {
     @column({ isPrimary: true })
@@ -23,6 +24,9 @@ export default class FlashcardSet extends BaseModel {
 
     @belongsTo(() => User)
     declare user: BelongsTo<typeof User>
+
+    @hasMany(() => CollectionSet)
+    declare sets: HasMany<typeof CollectionSet>
 
     @hasMany(() => Flashcard)
     declare flashcards: HasMany<typeof Flashcard>

@@ -36,7 +36,7 @@ const Page: React.FC = () => {
 
     useEffect(() => {
         if (!flashcardSetsContext.flashcardSets){
-          flashcardSetsContext.loadFlashcards("all");
+            flashcardSetsContext.loadFlashcards("all");
         }
     }, [flashcardSetsContext]);
 
@@ -181,7 +181,7 @@ const Page: React.FC = () => {
                         {selectedSets.map((set) => (
                             <li
                                 key={set.id}
-                                className="w-full bg-gradient-to-br from-[#c2e0d3] to-[#b3c7f9] rounded-xl shadow-xl p-4 flex flex-col space-y-2"
+                                className="w-full bg-gradient-to-br from-[#c2e0d3] to-[#b3c7f9] text-gray-600 rounded-xl shadow-xl p-4 flex flex-col space-y-2"
                             >
                                 <div className="flex justify-between items-center">
                                     <div>

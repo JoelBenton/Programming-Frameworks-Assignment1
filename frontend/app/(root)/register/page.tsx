@@ -33,8 +33,8 @@ const Page = () => {
         const result = await authInput.safeParseAsync(formData);
 
         if (!result.success) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const fieldErrors = result.error.errors.reduce(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (acc: any, curr: any) => {
                     acc[curr.path[0]] = acc[curr.path[0]]
                         ? [...acc[curr.path[0]], curr.message]

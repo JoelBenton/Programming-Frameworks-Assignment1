@@ -1,4 +1,4 @@
-name: Run AdonisJS Tests
+name: Run Tests
 
 on:
   push:
@@ -9,9 +9,8 @@ on:
       - main
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
-
     services:
       redis:
         image: redis:7
@@ -22,7 +21,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -36,18 +34,41 @@ jobs:
         working-directory: ./backend
         run: echo "Changed to /backend directory"
 
-      - name: Install Dependencies
+      - name: Install Backend Dependencies
         working-directory: ./backend
         run: npm install
 
-      - name: Copy .env.example
+      - name: Copy .env.example (Backend)
         working-directory: ./backend
         run: cp .env.example .env
 
-      - name: Generate APP_KEY
+      - name: Generate APP_KEY (Backend)
         working-directory: ./backend
         run: node ace generate:key
 
-      - name: Run Tests
+      - name: Run Backend Tests
         working-directory: ./backend
+        run: npm test
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Navigate to Frontend
+        working-directory: ./frontend
+        run: echo "Changed to /frontend directory"
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Run Frontend Tests
+        working-directory: ./frontend
         run: npm test

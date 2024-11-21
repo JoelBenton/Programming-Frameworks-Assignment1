@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Pagination from "@/components/Pagination";
 
 import { FlashcardSet as FlashcardType } from "@/lib/definitions";
@@ -18,7 +18,10 @@ export default function Home() {
     const flashcardSetsContext = useFlashcardSetsData();
 
     const session = sessionContext.session;
-    const flashcardSets = flashcardSetsContext.flashcardSets || [];
+    const flashcardSets = useMemo(() => 
+        flashcardSetsContext.flashcardSets || [], 
+    [flashcardSetsContext.flashcardSets]
+    );
     const users = userContext?.users || [];
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -26,11 +29,12 @@ export default function Home() {
 
     useEffect(() => {
         flashcardSetsContext.loadFlashcards("all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session, flashcardSetsContext.loadFlashcards]);
 
     const router = useRouter();
 
-    if (!flashcardSets || !users) {
+    if (!flashcardSets || !users ) {
         return <ErrorPage />;
     }
 
