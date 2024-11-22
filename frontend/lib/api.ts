@@ -18,8 +18,7 @@ export const fetchUsers = async (): Promise<User[] | null> => {
         );
 
         return (await user_response.json()).data;
-    } catch (error) {
-        console.error("Error fetching users: ", error);
+    } catch {
         return null;
     }
 };
@@ -37,8 +36,7 @@ export async function fetchFlashcardSets(): Promise<FlashcardSet[] | null> {
             return (await response.json()).data;
         }
         return null;
-    } catch (error) {
-        console.error("Error fetching flashcard sets:", error);
+    } catch {
         return null;
     }
 }
@@ -63,8 +61,7 @@ export async function fetchUserFlashcardSets(
             return (await response.json()).data;
         }
         return null;
-    } catch (error) {
-        console.error("Error fetching user flashcard sets:", error);
+    } catch {
         return null;
     }
 }
@@ -89,8 +86,7 @@ export async function fetchFlashcardCommentSet(
             return (await response.json()).data;
         }
         return null;
-    } catch (error) {
-        console.error("Error fetching user flashcard sets:", error);
+    } catch {
         return null;
     }
 }
@@ -106,8 +102,7 @@ export async function fetchCollections(): Promise<Collection[] | null> {
             return (await response.json()).data;
         }
         return null;
-    } catch (error) {
-        console.error("Error fetching flashcard sets:", error);
+    } catch {
         return null;
     }
 }

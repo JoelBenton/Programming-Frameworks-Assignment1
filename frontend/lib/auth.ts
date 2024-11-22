@@ -8,7 +8,7 @@ import type {
 export async function register(credentials: Credentials) {
     try {
         const response = await fetch(
-            "${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/register",
+            `${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/register`,
             {
                 method: "POST",
                 headers: {
@@ -18,8 +18,6 @@ export async function register(credentials: Credentials) {
             },
         );
 
-        console.log(await response.json());
-
         if (response.ok) {
             return { success: true };
         } else if (response.status === 403) {
@@ -27,8 +25,7 @@ export async function register(credentials: Credentials) {
         } else {
             return { success: false, error: "An unknown error occurred" };
         }
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             success: false,
             error: "Network error. Please try again later.",
@@ -65,8 +62,7 @@ export async function login(credentials: Credentials) {
         } else {
             return { success: false, error: "An unknown error occurred" };
         }
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             success: false,
             error: "Network error. Please try again later.",
