@@ -62,7 +62,7 @@ describe("UserManagementPage", () => {
 
     it("renders user management form for admin users", () => {
         (useSession as jest.Mock).mockReturnValue({
-            session: { user: { id: 1, admin: true } },
+            session: { id: 1, admin: true } ,
         });
         (useUsers as jest.Mock).mockReturnValue({
             users: [{ id: 1, username: "JohnDoe", admin: false }],
@@ -75,7 +75,7 @@ describe("UserManagementPage", () => {
 
     it("handles user selection", () => {
         (useSession as jest.Mock).mockReturnValue({
-            session: { user: { id: 1, admin: true } },
+            session: { id: 1, admin: true },
         });
         (useUsers as jest.Mock).mockReturnValue({
             users: [{ id: 1, username: "JohnDoe", admin: false }],

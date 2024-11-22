@@ -41,7 +41,7 @@ describe("Home Page", () => {
             users: [{ id: 1, username: "testuser", admin: false }],
         });
         (useSession as jest.Mock).mockReturnValue({
-            session: { user: { id: 1, username: "testuser" } },
+            session: { id: 1, username: "testuser" },
         });
         (useFlashcardSetsData as jest.Mock).mockReturnValue({
             flashcardSets: [
@@ -72,7 +72,7 @@ describe("Home Page", () => {
             users: [{ id: 1, username: "testuser", admin: false }],
         });
         (useSession as jest.Mock).mockReturnValue({
-            session: { user: { id: 1, username: "testuser" } },
+            session: { id: 1, username: "testuser" },
         });
         (useFlashcardSetsData as jest.Mock).mockReturnValue({
             flashcardSets: [
@@ -98,7 +98,7 @@ describe("Home Page", () => {
             users: [{ id: 1, username: "testuser", admin: false }],
         });
         (useSession as jest.Mock).mockReturnValue({
-            session: { user: { id: 1, username: "testuser" } },
+            session: { id: 1, username: "testuser" },
         });
         (useFlashcardSetsData as jest.Mock).mockReturnValue({
             flashcardSets: [],

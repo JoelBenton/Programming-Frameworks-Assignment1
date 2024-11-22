@@ -48,7 +48,7 @@ describe("Library Page", () => {
     };
 
     const mockSession = {
-        session: { user: { id: 123 } },
+        session: { id: 123 },
         refreshSession: jest.fn(),
         logout: jest.fn(),
     };
