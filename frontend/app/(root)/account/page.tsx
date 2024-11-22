@@ -30,14 +30,12 @@ const Page = () => {
         return (
             <div className="flex justify-center items-center h-screen">
                 <p className="text-center text-gray-700 bg-gray-100 p-4 rounded-xl shadow-xl">
-                    Please{" "}
                     <span
                         className="font-bold text-blue-600"
                         onClick={() => router.push("/login")}
                     >
-                        Login
-                    </span>{" "}
-                    to view Account
+                        Please Login to view Account
+                    </span>
                 </p>
             </div>
         );
