@@ -109,9 +109,9 @@ const Page: React.FC = () => {
     if (!validatedData) {
         return (
             <div className="flex justify-center items-center h-screen">
-                    <p className="text-center text-red-500 bg-gray-100 p-4 rounded-xl shadow-xl">
+                <p className="text-center text-red-500 bg-gray-100 p-4 rounded-xl shadow-xl">
                          Loading collection data / Failed to load collection. Please try again later.
-                    </p>
+                </p>
             </div>
         );
     }
@@ -181,7 +181,7 @@ const Page: React.FC = () => {
         <div className="flex justify-center items-start min-h-screen py-10 overflow-auto">
             <div className="flex w-3/5 h-full flex-col items-start p-6 shadow-xl rounded-3xl">
                 <div className="p-3 pt-10 w-full pb-10 text-4xl font-bold">
-                    "Update Collection"
+                    Update Collection
                 </div>
 
                 <input

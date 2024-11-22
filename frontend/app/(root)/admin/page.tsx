@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/rules-of-hooks */
 
 import React, { useEffect, useState } from "react";
 import { User } from "@/lib/definitions";
@@ -18,14 +19,12 @@ export default function UserManagementPage() {
         return (
             <div className="flex justify-center items-center h-screen">
                 <p className="text-center text-gray-700 bg-gray-100 p-4 rounded-xl shadow-xl">
-                    Please{" "}
                     <span
                         className="font-bold text-blue-600"
                         onClick={() => router.push("/login")}
                     >
-                        Login
-                    </span>{" "}
-                    with an admin account to view Admin Page!
+                        Please Login with an admin account to view Admin Page!
+                    </span>
                 </p>
             </div>
         );

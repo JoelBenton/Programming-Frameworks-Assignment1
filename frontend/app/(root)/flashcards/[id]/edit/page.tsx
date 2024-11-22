@@ -9,7 +9,6 @@ import React, { useEffect, useState } from "react";
 import type { FlashcardSet } from "@/lib/definitions";
 import { useFlashcardCommentSetData } from "@/components/context/FlashcardCommentSetContext";
 import ErrorPage from "@/components/ErrorPage";
-import { sleep } from "@/lib/utils";
 
 const Page = () => {
     const router = useRouter();
@@ -20,6 +19,7 @@ const Page = () => {
 
     useEffect(() => {
         loadFlashcardCommentSet(String(params.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session, loadFlashcardCommentSet]);
 
     if (!session) {
@@ -170,6 +170,7 @@ const Page = () => {
         };
 
         fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading, validatedData]);
 
     const handleDeleteSet = async () => {

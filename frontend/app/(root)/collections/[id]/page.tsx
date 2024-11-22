@@ -56,14 +56,14 @@ const Page = () => {
                 </div>
                 {session?.user.id == collection.user.id ? (
                     <button
-                    className="text-blue-500 font-semibold mt-4"
-                    onClick={handleEditRedirect}
-                >
+                        className="text-blue-500 font-semibold mt-4"
+                        onClick={handleEditRedirect}
+                    >
                     Edit Collection
-                </button>
-                    ) : (
+                    </button>
+                ) : (
                     <></>
-                    )
+                )
                 }
                 <div className="text-center text-5xl font-bold my-10">Sets</div>
                 {collection.sets.map((set, index) => {

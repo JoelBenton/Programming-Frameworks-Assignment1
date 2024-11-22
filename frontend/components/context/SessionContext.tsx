@@ -8,11 +8,11 @@ const SessionContext = createContext<{
     session: SessionPayload | null;
     refreshSession: () => void;
     logout: () => void;
-}>({
-    session: null,
-    refreshSession: () => {},
-    logout: () => {},
-});
+        }>({
+            session: null,
+            refreshSession: () => {},
+            logout: () => {},
+        });
 
 export const useSession = () => useContext(SessionContext);
 
