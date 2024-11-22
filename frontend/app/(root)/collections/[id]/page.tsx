@@ -54,7 +54,7 @@ const Page = () => {
                 <div className="text-lg text-gray-400">
                     Created by user: {collection.user.username || "Unknown"}
                 </div>
-                {session?.user.id == collection.user.id ? (
+                {session?.id == collection.user.id ? (
                     <button
                         className="text-blue-500 font-semibold mt-4"
                         onClick={handleEditRedirect}

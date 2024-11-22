@@ -97,7 +97,7 @@ const Page = () => {
                 return;
             }
             credentials = {
-                username: session.user.username,
+                username: session.username,
                 password: newPassword,
             };
         } else {
@@ -107,7 +107,7 @@ const Page = () => {
             return;
         }
 
-        const token = session.user.token;
+        const token = session.token;
         if (!token) {
             setError("You are not authorized. Please log in again.");
             return;
@@ -116,7 +116,7 @@ const Page = () => {
         // Send the request
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/${session.user.id}`,
+                `${process.env.NEXT_PUBLIC_API_URL_BASE}/api/users/${session.id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -153,7 +153,7 @@ const Page = () => {
     return (
         <div className="bg-gradient-to-br from-[#09092c] to-[#634698] text-white min-h-screen flex flex-col items-center justify-center p-8">
             <div className="text-3xl font-bold mb-6">
-                {session?.user.username}
+                {session.username}
             </div>
 
             <div className="w-full max-w-lg bg-[#1e1e2f] p-6 rounded-2xl shadow-lg">

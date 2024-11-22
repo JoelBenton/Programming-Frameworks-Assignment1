@@ -1,11 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { getSession, deleteSession } from "@/lib/session";
-import type { SessionPayload } from "@/lib/definitions";
+import type { CurrentUser } from "@/lib/definitions";
 
 const SessionContext = createContext<{
-    session: SessionPayload | null;
+    session: CurrentUser | null;
     refreshSession: () => void;
     logout: () => void;
         }>({
@@ -19,12 +18,12 @@ export const useSession = () => useContext(SessionContext);
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    const [session, setSession] = useState<SessionPayload | null>(null);
+    const [session, setSession] = useState<CurrentUser | null>(null);
 
     useEffect(() => {
         const fetchSession = async () => {
             try {
-                const sessionData = await getSession();
+                const sessionData = localStorage.getItem("user");
                 setSession(sessionData ? JSON.parse(sessionData) : null);
             } catch (error) {
                 console.error("Failed to load session:", error);
@@ -38,7 +37,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
     // Memoize the refreshSession function
     const refreshSession = useCallback(async () => {
         try {
-            const updatedSession = await getSession();
+            const updatedSession = localStorage.getItem("user");
             setSession(updatedSession ? JSON.parse(updatedSession) : null);
         } catch (error) {
             console.error("Failed to refresh session:", error);
@@ -49,7 +48,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
     // Memoize the logout function
     const logout = useCallback(async () => {
         try {
-            await deleteSession();
+            localStorage.removeItem("user");
             setSession(null);
         } catch (error) {
             console.error("Failed to logout:", error);

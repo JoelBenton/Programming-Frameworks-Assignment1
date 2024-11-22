@@ -79,7 +79,7 @@ const Page = () => {
 
         const result = setsInput.safeParse({
             name: title,
-            user_id: session.user.id,
+            user_id: session.id,
             cards: nonEmptyCards,
         });
 
@@ -130,7 +130,7 @@ const Page = () => {
                         method: "POST",
                         headers: {
                             "content-type": "application/json",
-                            Authorization: `Bearer ${session?.user.token}`,
+                            Authorization: `Bearer ${session?.token}`,
                         },
                         body: JSON.stringify(validatedData),
                     },

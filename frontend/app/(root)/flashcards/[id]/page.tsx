@@ -38,11 +38,11 @@ const FlashcardPage = () => {
             const postComment = async () => {
                 try {
                     console.log(
-                        session?.user.id != flashcardCommentSet?.user_id,
+                        session?.id != flashcardCommentSet?.user_id,
                     );
                     if (
                         !canComment &&
-                        session?.user.id != flashcardCommentSet?.user_id
+                        session?.id != flashcardCommentSet?.user_id
                     ) {
                         setErrorMessage("Please sign in to send Comment");
                         return;
@@ -63,11 +63,11 @@ const FlashcardPage = () => {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
-                                Authorization: `Bearer ${session?.user.token}`,
+                                Authorization: `Bearer ${session.token}`,
                             },
                             body: JSON.stringify({
                                 message: newComment,
-                                user_id: session?.user.id,
+                                user_id: session.id,
                             }),
                         },
                     );
@@ -86,9 +86,9 @@ const FlashcardPage = () => {
                             {
                                 comment: newComment,
                                 author: {
-                                    id: session.user.id,
-                                    username: session.user.username,
-                                    admin: session.user.admin,
+                                    id: session.id,
+                                    username: session.username,
+                                    admin: session.admin,
                                 },
                             },
                         ]);
@@ -178,7 +178,7 @@ const FlashcardPage = () => {
                             setCurrentCardIndex(page - 1);
                         }}
                     />
-                    {flashcardCommentSet.user_id === session?.user.id ? (
+                    {flashcardCommentSet.user_id === session?.id ? (
                         <button
                             className="text-blue-500 font-semibold mt-4"
                             onClick={handleEditRedirect}
@@ -226,7 +226,7 @@ const FlashcardPage = () => {
                         )}
 
                         {canComment &&
-                        session?.user.id !== flashcardCommentSet?.user_id ? (
+                        session?.id !== flashcardCommentSet?.user_id ? (
                                 <div className="mt-4">
                                     <textarea
                                         className="w-full p-3 border rounded-lg text-black resize-none"
@@ -249,7 +249,7 @@ const FlashcardPage = () => {
                                     Submit Comment
                                     </button>
                                 </div>
-                            ) : session?.user.id ===
+                            ) : session?.id ===
                           flashcardCommentSet?.user_id ? (
                                     <p></p>
                                 ) : (

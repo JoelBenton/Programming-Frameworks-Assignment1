@@ -1,34 +1,9 @@
 "use client";
 
-import { SignJWT, jwtVerify } from "jose";
-import { createSession, deleteSession, getSession } from "@/lib/session";
 import type {
     Credentials,
-    SessionPayload,
     CurrentUser,
 } from "@/lib/definitions";
-
-const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
-const key = new TextEncoder().encode(secretKey);
-
-export async function encrypt(payload: SessionPayload) {
-    return new SignJWT(payload)
-        .setProtectedHeader({ alg: "HS256" })
-        .setIssuedAt()
-        .setExpirationTime("1 day from now")
-        .sign(key);
-}
-
-export async function decrypt(session: string | undefined = "") {
-    try {
-        const { payload } = await jwtVerify(session, key, {
-            algorithms: ["HS256"],
-        });
-        return JSON.stringify(payload);
-    } catch {
-        return null;
-    }
-}
 
 export async function register(credentials: Credentials) {
     try {
@@ -83,7 +58,7 @@ export async function login(credentials: Credentials) {
                 token: data.token.token,
             };
 
-            createSession(user);
+            localStorage.setItem("user", JSON.stringify(user));
             return { success: true, user };
         } else if (response.status === 403 || response.status === 400) {
             return { success: false, error: "Login Failed! Try again" };
@@ -99,12 +74,12 @@ export async function login(credentials: Credentials) {
     }
 }
 export async function logout() {
-    deleteSession();
+    localStorage.removeItem("user");
 }
 
 export async function checkSession() {
-    const session = await getSession();
-    if (!session) {
+    const user = localStorage.getItem("user");
+    if (!user) {
         return false;
     } else return true;
 }

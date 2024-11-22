@@ -1,4 +1,3 @@
-import { CollectionFactory } from '#database/factories/collection_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import User from '#models/user'
 import testUtils from '@adonisjs/core/services/test_utils'

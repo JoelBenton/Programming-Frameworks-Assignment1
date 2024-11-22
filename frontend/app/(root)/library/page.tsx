@@ -15,7 +15,7 @@ const Page = () => {
     const router = useRouter();
 
     const session = sessionContext.session;
-    const userId = session?.user.id;
+    const userId = session?.id;
 
     useEffect(() => {
         flashcardUsersSetsContext.loadFlashcards("user", String(userId) || "");

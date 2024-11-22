@@ -51,7 +51,7 @@ const Page: React.FC = () => {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${session?.user.token}`,
+                            Authorization: `Bearer ${session?.token}`,
                         },
                         body: JSON.stringify(validatedData),
                     },
@@ -146,7 +146,7 @@ const Page: React.FC = () => {
                 comment: set.comment,
                 setID: set.id,
             })),
-            userId: session.user.id,
+            userId: session.id,
         };
 
         setValidatedData(collectionData);

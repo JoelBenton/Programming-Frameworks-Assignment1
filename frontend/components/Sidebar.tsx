@@ -5,15 +5,15 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { icons } from "lucide-react";
 import Icon from "./Icon";
-import type { SessionPayload } from "@/lib/definitions";
 import { useRouter, usePathname } from "next/navigation";
 import { logout } from "@/lib/auth";
+import { CurrentUser } from "@/lib/definitions";
 
 const Sidebar = ({
     session,
     refreshSession,
 }: {
-    session: SessionPayload | null;
+    session: CurrentUser | null;
     refreshSession: () => void;
 }) => {
     const Menus: {
@@ -44,12 +44,12 @@ const Sidebar = ({
             icon: "PanelsTopLeft",
             path: ["/collections/create"],
         }),
-            Menus.push({
-                title: "Account",
-                icon: "CircleUser",
-                path: ["/account"],
-            });
-        if (data.user.admin === true) {
+        Menus.push({
+            title: "Account",
+            icon: "CircleUser",
+            path: ["/account"],
+        });
+        if (data.admin === true) {
             Menus.push({ title: "Admin", icon: "ServerCog", path: ["/admin"] });
         }
     } else {

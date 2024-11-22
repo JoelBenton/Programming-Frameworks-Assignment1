@@ -43,7 +43,7 @@ const Page = () => {
         return <ErrorPage />;
     }
 
-    if (session?.user.id !== flashcardCommentSet.user_id) {
+    if (session?.id !== flashcardCommentSet.user_id) {
         router.back();
     }
 
@@ -93,7 +93,7 @@ const Page = () => {
 
         const result = setsInput.safeParse({
             name: title,
-            user_id: session.user.id,
+            user_id: session.id,
             cards: nonEmptyCards,
         });
 
@@ -144,7 +144,7 @@ const Page = () => {
                         method: "PUT",
                         headers: {
                             "content-type": "application/json",
-                            Authorization: `Bearer ${session?.user.token}`,
+                            Authorization: `Bearer ${session?.token}`,
                         },
                         body: JSON.stringify(validatedData),
                     },
@@ -185,7 +185,7 @@ const Page = () => {
                     method: "DELETE",
                     headers: {
                         "content-type": "application/json",
-                        Authorization: `Bearer ${session?.user.token}`,
+                        Authorization: `Bearer ${session?.token}`,
                     },
                 },
             );

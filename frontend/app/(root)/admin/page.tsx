@@ -15,7 +15,7 @@ export default function UserManagementPage() {
     const session = sessionContext.session;
     const users = userContext.users
 
-    if (!session || session?.user.admin != true) {
+    if (!session || session.admin != true) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <p className="text-center text-gray-700 bg-gray-100 p-4 rounded-xl shadow-xl">
@@ -99,7 +99,7 @@ export default function UserManagementPage() {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${session?.user.token}`,
+                        Authorization: `Bearer ${session.token}`,
                     },
                     body: JSON.stringify(data),
                 },
@@ -136,7 +136,7 @@ export default function UserManagementPage() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${session?.user.token}`,
+                        Authorization: `Bearer ${session.token}`,
                     },
                     body: JSON.stringify(data),
                 },

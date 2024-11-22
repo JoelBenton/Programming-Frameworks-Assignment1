@@ -10,11 +10,6 @@ export type CurrentUser = {
     token: string;
 };
 
-export type SessionPayload = {
-    user: CurrentUser;
-    expires: Date;
-};
-
 export type Flashcard = {
     id?: number;
     question: string;

@@ -62,7 +62,7 @@ const Page: React.FC = () => {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${session?.user.token}`,
+                            Authorization: `Bearer ${session.token}`,
                         },
                         body: JSON.stringify(validatedData),
                     });
