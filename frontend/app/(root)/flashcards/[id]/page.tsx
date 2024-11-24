@@ -16,11 +16,11 @@ const FlashcardPage = () => {
     const [newComment, setNewComment] = useState("");
     const [newRating, setNewRating] = useState(0);
     const [canComment, setCanComment] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [submitComment, setSubmitComment] = useState(false);
     const [comments, setComments] = useState(
         flashcardCommentSet?.comments || [],
     );
-    const [errorMessage, setErrorMessage] = useState("");
-    const [submitComment, setSubmitComment] = useState(false);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { session, refreshSession } = useSession() || {};
@@ -207,7 +207,10 @@ const FlashcardPage = () => {
             <div className="w-full max-w-7xl mt-8">
                 <button
                     className="text-blue-500 font-semibold mb-4"
-                    onClick={() => setShowComments(!showComments)}
+                    onClick={() => {
+                        setShowComments(!showComments)
+                        setComments(flashcardCommentSet.comments);
+                    }}
                 >
                     {showComments ? "Hide Comments" : "Show Comments"}
                 </button>
