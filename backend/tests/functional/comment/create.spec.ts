@@ -12,13 +12,15 @@ test.group('Create a Flashcard Set Comment', (group) => {
 
         const response = await client
             .post(`/api/sets/${data.flashcardSets[0].id}/comment`)
-            .json({ user_id: user.id, message: 'I like this set' })
+            .json({ user_id: user.id, message: 'I like this set', rating: 5 })
             .loginAs(user)
 
         const responseData = response.response.body
 
         const finalData = {
             comment: 'I like this set',
+            comment_id: responseData.comment_id,
+            rating: responseData.rating,
             set: {
                 id: data.flashcardSets[0].id,
                 name: data.flashcardSets[0].name,

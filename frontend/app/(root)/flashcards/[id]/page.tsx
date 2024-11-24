@@ -1,6 +1,7 @@
 "use client";
 
 import { useFlashcardCommentSetData } from "@/components/context/FlashcardCommentSetContext";
+import StarRating from "@/components/StarRating";
 import React, { useState, useEffect } from "react";
 import Pagination from "@/components/Pagination";
 import { useSession } from "@/components/context/SessionContext";
@@ -13,6 +14,7 @@ const FlashcardPage = () => {
     const [showAnswer, setShowAnswer] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState("");
+    const [newRating, setNewRating] = useState(0);
     const [canComment, setCanComment] = useState(false);
     const [comments, setComments] = useState(
         flashcardCommentSet?.comments || [],
@@ -57,22 +59,31 @@ const FlashcardPage = () => {
                         );
                         return;
                     }
+                    console.log(newRating);
+
+                    if (newRating <= 0 || newRating >= 5) {
+                        setErrorMessage("Rating must be between 1 and 5");
+                        return;
+                    }
                     const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL_BASE}/api/set/${flashcardCommentSet.id}/comment`,
+                        `${process.env.NEXT_PUBLIC_API_URL_BASE}/api/sets/${flashcardCommentSet.id}/comment`,
                         {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                                 Authorization: `Bearer ${session.token}`,
                             },
+                            
                             body: JSON.stringify({
                                 message: newComment,
+                                rating: newRating,
                                 user_id: session.id,
                             }),
                         },
                     );
 
                     if (!response.ok) {
+                        console.log(response);
                         setErrorMessage(
                             "Failed to post comment. Please try again later.",
                         );
@@ -85,6 +96,7 @@ const FlashcardPage = () => {
                             ...prevComments,
                             {
                                 comment: newComment,
+                                rating: newRating,
                                 author: {
                                     id: session.id,
                                     username: session.username,
@@ -93,6 +105,7 @@ const FlashcardPage = () => {
                             },
                         ]);
                         setNewComment("");
+                        setNewRating(0);
                     }
                 } catch (error) {
                     setErrorMessage(
@@ -107,7 +120,7 @@ const FlashcardPage = () => {
             postComment();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [submitComment, newComment, session]);
+    }, [submitComment, newComment, newRating, session]);
 
     if (!flashcardCommentSet) {
         return <p>Data currently not loaded. Try again in a minute</p>;
@@ -216,6 +229,11 @@ const FlashcardPage = () => {
                                     <div className="text-gray-500 flex items-center ml-4">
                                         <div className="w-px h-full bg-gray-300 mx-3"></div>
                                         <span>{comment.author.username}</span>
+                                        <StarRating
+                                            rating={comment.rating || 0}
+                                            onRatingChange={() => {}}
+                                            readonly={true}
+                                        />
                                     </div>
                                 </div>
                             ))
@@ -237,17 +255,23 @@ const FlashcardPage = () => {
                                             setNewComment(e.target.value)
                                         }
                                     />
+                                    <div className="mt-2 flex items-center gap-4">
+                                        <StarRating
+                                            rating={newRating}
+                                            onRatingChange={setNewRating}
+                                        />
+                                        <button
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg"
+                                            onClick={handleAddComment}
+                                        >
+                                    Submit Comment
+                                        </button>
+                                    </div>
                                     {errorMessage && (
                                         <p className="text-red-500">
                                             {errorMessage}
                                         </p>
                                     )}
-                                    <button
-                                        className="mt-2 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg"
-                                        onClick={handleAddComment}
-                                    >
-                                    Submit Comment
-                                    </button>
                                 </div>
                             ) : session?.id ===
                           flashcardCommentSet?.user_id ? (

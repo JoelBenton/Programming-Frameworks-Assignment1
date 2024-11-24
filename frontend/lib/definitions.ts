@@ -44,6 +44,7 @@ export type User = {
 
 export type Comment = {
     comment: string;
+    rating: number;
     author: User;
 };
 

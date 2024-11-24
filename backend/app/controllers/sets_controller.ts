@@ -172,6 +172,8 @@ export default class SetsController {
                 ...flashcardSetsList,
                 comments: flashcardSet.comments.map((comment) => ({
                     comment: comment.comment,
+                    comment_id: comment.id,
+                    rating: comment.rating,
                     author: {
                         id: comment.user.id,
                         username: comment.user.username,

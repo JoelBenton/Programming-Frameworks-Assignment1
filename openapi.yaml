@@ -190,6 +190,12 @@ paths:
                             comment:
                               type: "string"
                               example: "I love this set!"
+                            comment_id:
+                              type: "number"
+                              example: 1
+                            rating:
+                              type: "number"
+                              example: 5
                             author:
                               $ref: "#/components/schemas/User"
         "404":
@@ -332,6 +338,9 @@ paths:
                 comment:
                   type: "string"
                   example: "I love this set!"
+                rating:
+                  type: "number"
+                  example: 5
                 user_id:
                   type: "number"
                   example: 1
@@ -364,6 +373,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /sets/{setId}/comment/{commentId}:
+   delete:
+      summary: "Delete a comment on a flashcard set by comment ID"
+      parameters:
+        - name: commentID
+          in: path
+          required: true
+          description: "The ID of the comment"
+          schema:
+            type: "string"
+      tags:
+        - "FlashCard Sets"
+      responses:
+        "204":
+          description: "The comment was deleted"
+        "401":
+          description: "Unauthorised"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized access"
+        "404":
+          description: "The flashcard set was not found"
+
   /sets/{setId}/cards:
     parameters:
       - name: setId
@@ -1022,6 +1059,12 @@ components:
         comment:
           type: "string"
           example: "I love this set!"
+        comment_id:
+          type: "number"
+          example: 1
+        rating:
+          type: "number"
+          example: 5
         set:
           $ref: "#/components/schemas/FlashcardSet"
           nullable: true

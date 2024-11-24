@@ -46,7 +46,7 @@ router
             .use(['update', 'destroy'], middleware.auth())
         router
             .resource('sets.comment', CommentsController)
-            .only(['store'])
+            .only(['store', 'destroy'])
             .use('*', middleware.auth())
         router.resource('sets.cards', CardsController).only(['index'])
         router

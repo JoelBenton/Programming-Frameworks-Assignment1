@@ -24,6 +24,7 @@ export default class CommentsController {
             const comment = await Comment.create({
                 userId: data.user_id,
                 comment: data.message,
+                rating: data.rating,
                 flashcardSetId: flashcardSetId,
             })
             await comment.load('flashcardSet')
@@ -32,6 +33,8 @@ export default class CommentsController {
 
             return response.created({
                 comment: comment.comment,
+                comment_id: comment.id,
+                rating: comment.rating,
                 set: {
                     id: comment.flashcardSet.id,
                     name: comment.flashcardSet.name,
@@ -61,6 +64,28 @@ export default class CommentsController {
             // Handle any other errors
             return response.internalServerError({
                 message: 'An error occurred while creating the comment',
+                error: error.message,
+            })
+        }
+    }
+
+    async destroy({ params, response }: HttpContext) {
+        try {
+            const id = params.id
+            const comment = await Comment.findOrFail(id)
+            await comment.delete()
+            return response.noContent()
+        } catch (error) {
+            if (error.code === 'E_ROW_NOT_FOUND') {
+                return response.notFound({
+                    message: 'The comment was not found',
+                    error: error.message,
+                })
+            }
+
+            // Handle any other errors
+            return response.internalServerError({
+                message: 'An error occurred while deleting the comment',
                 error: error.message,
             })
         }

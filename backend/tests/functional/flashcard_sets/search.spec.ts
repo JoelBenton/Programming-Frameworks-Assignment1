@@ -34,6 +34,8 @@ test.group('Find Flashcard Set based on Set ID', (group) => {
             comments: [
                 {
                     comment: CreatedData.flashcardSets[0].comments[0].comment,
+                    comment_id: CreatedData.flashcardSets[0].comments[0].id,
+                    rating: CreatedData.flashcardSets[0].comments[0].rating,
                     author: {
                         id: CreatedData.flashcardSets[0].comments[0].user.id,
                         username: CreatedData.flashcardSets[0].comments[0].user.username,

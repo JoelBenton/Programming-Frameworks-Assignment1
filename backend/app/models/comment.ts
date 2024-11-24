@@ -12,6 +12,9 @@ export default class Comment extends BaseModel {
     declare comment: string
 
     @column()
+    declare rating: number
+
+    @column()
     declare flashcardSetId: number
 
     @column()

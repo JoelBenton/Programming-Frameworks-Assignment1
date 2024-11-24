@@ -7,6 +7,7 @@ export const CommentFactory = factory
     .define(Comment, async ({ faker }) => {
         return {
             comment: faker.lorem.sentence(),
+            rating: faker.number.int({ min: 1, max: 5 }),
         }
     })
     .relation('user', () => UserFactory)
