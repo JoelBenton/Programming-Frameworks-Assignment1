@@ -86,27 +86,25 @@ export default class SetsController {
      */
     async store({ request, response, bouncer, auth }: HttpContext) {
         try {
+            // Get current authenticated User
+            const user = auth.getUserOrFail()
+
             let totalRequests = Number(await Redis.get(totalRequestsKey))
             const limit = Number(await Redis.get(limitKey))
-            let admin = false
+            let admin = user.admin
 
             const remainingRequests = limit - totalRequests
 
-            if (!(await bouncer.allows(isAdmin))) {
+            if (!admin) {
                 if (remainingRequests <= 0) {
                     return response.tooManyRequests({
                         message: 'Rate limit exceeded. Try again tomorrow.',
                     })
                 }
-            } else {
-                admin = true
             }
 
             // Get all request data
             const data = request.all()
-
-            // Get current authenticated User
-            const user = auth.getUserOrFail()
 
             // Validate the data using the validator
             const payload = await flashcardSetsValidator.validate(data)

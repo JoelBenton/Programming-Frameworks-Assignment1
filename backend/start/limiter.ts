@@ -23,7 +23,7 @@ export const throttle = limiter.define('api', async () => {
     const totalRequestsKey = 'global_total_requests'
     const limitKey = 'global_daily_limit'
 
-    // Fetch the current total requests count from Redis
+    // // Fetch the current total requests count from Redis
     let totalRequests = await Redis.get(totalRequestsKey)
 
     if (!totalRequests) {
@@ -33,18 +33,13 @@ export const throttle = limiter.define('api', async () => {
     }
 
     // Fetch the maximum requests per day from Redis
-    let MAX_REQUESTS_PER_DAY = Number(await Redis.connection('main').get(limitKey))
+    let MAX_REQUESTS_PER_DAY = Number(await Redis.get(limitKey))
 
-    if (!MAX_REQUESTS_PER_DAY || MAX_REQUESTS_PER_DAY <= 0) {
+    if (!MAX_REQUESTS_PER_DAY || MAX_REQUESTS_PER_DAY === 0) {
         MAX_REQUESTS_PER_DAY = 20
         await Redis.set(limitKey, MAX_REQUESTS_PER_DAY) // Set the limit in Redis
     } else {
         MAX_REQUESTS_PER_DAY = Number(MAX_REQUESTS_PER_DAY)
-    }
-
-    // Check if the total requests are below the limit
-    if (Number(totalRequests) > MAX_REQUESTS_PER_DAY) {
-        throw new Error('Rate limit exceeded. Try again tomorrow.')
     }
 
     // Allow requests for the current middleware

@@ -28,7 +28,6 @@ function returnCollectionData(CollectionData: Collection) {
             username: CollectionData.user.username,
         },
     }
-    // console.log(JSON.stringify(formattedData))
     return formattedData
 }
 

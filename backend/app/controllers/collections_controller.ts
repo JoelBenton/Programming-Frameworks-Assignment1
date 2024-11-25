@@ -29,7 +29,6 @@ function returnCollectionData(CollectionData: Collection) {
             username: CollectionData.user.username,
         },
     }
-    // console.log(JSON.stringify(formattedData))
     return formattedData
 }
 
@@ -57,7 +56,6 @@ export default class CollectionsController {
                 data: collectionsList,
             })
         } catch (error) {
-            console.log(error)
             return response.internalServerError({
                 message: 'An error occurred while obtaining Flashcard Sets',
                 error: error.message,
