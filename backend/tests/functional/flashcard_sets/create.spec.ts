@@ -54,8 +54,8 @@ test.group('Create Flashcard Set', (group) => {
     test('Unauthorised Creation of a Flashcard Set', async ({ assert, client }) => {
         const user = await UserFactory.merge({ admin: false }).create()
 
-        await redis.set('global_total_requests', 1)
-        await redis.set('global_daily_limit', 1)
+        await redis.connection('testing').set('global_total_requests', 1)
+        await redis.connection('testing').set('global_daily_limit', 1)
 
         const response = await client.post('/api/sets').json({}).loginAs(user)
 

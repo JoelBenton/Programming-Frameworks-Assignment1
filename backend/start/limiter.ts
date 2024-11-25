@@ -33,9 +33,9 @@ export const throttle = limiter.define('api', async () => {
     }
 
     // Fetch the maximum requests per day from Redis
-    let MAX_REQUESTS_PER_DAY = Number(await Redis.get(limitKey))
+    let MAX_REQUESTS_PER_DAY = Number(await Redis.connection('main').get(limitKey))
 
-    if (!MAX_REQUESTS_PER_DAY) {
+    if (!MAX_REQUESTS_PER_DAY || MAX_REQUESTS_PER_DAY <= 0) {
         MAX_REQUESTS_PER_DAY = 20
         await Redis.set(limitKey, MAX_REQUESTS_PER_DAY) // Set the limit in Redis
     } else {
