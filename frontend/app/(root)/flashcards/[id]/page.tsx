@@ -61,7 +61,8 @@ const FlashcardPage = () => {
                     }
                     console.log(newRating);
 
-                    if (newRating <= 0 || newRating >= 5) {
+                    if (newRating <= 0 || newRating > 5) {
+                        console.log(newRating)
                         setErrorMessage("Rating must be between 1 and 5");
                         return;
                     }
